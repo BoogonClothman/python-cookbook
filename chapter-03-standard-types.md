@@ -8,7 +8,9 @@
 
 Python 提供四种核心数字类型，它们构成了一切数值计算的基础。
 
-### 3.1.1 类型概览
+### 3.1.1 类型概览与构造函数签名
+
+Python 的内置类型看起来简单，但它们的构造函数都有多组重载——理解这些重载能让你写出更简洁、更高效的代码。
 
 | 类型 | 构造函数 | 字面量示例 | 底层 | 可变性 |
 |------|---------|-----------|------|--------|
@@ -18,6 +20,97 @@ Python 提供四种核心数字类型，它们构成了一切数值计算的基�
 | `bool` | `bool()` | `True`, `False` | `int` 子类 | 不可变 |
 
 **关键事实**：`bool` 是 `int` 的子类——`True == 1` 且 `False == 0`，但 `True is 1` 为 `False`。这在类型检查时可能引发意外行为。
+
+#### 构造函数签名详解
+
+构造函数是理解一个类型的第一扇门。这里给出四个核心数值类型的完整签名。
+
+**`int()`** — 三种构造模式：
+
+```
+int(x=0)
+int(x, base=10)
+```
+
+| 参数 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| `x` | `int \| float \| str \| bytes \| bytearray` | `0` | 要转换的数值/字符串；省略则返回 `0` |
+| `base` | `int` | `10` | 进制（2–36），仅在 `x` 为 `str`/`bytes` 时有效 |
+
+```python
+# 模式 1：从数值转换（截断，非四舍五入）
+>>> int(3.99)           # 3
+>>> int(-3.99)          # -3
+
+# 模式 2：从字符串 + 进制解析
+>>> int("42")           # 42  （base 默认为 10）
+>>> int("FF", 16)       # 255  （十六进制）
+>>> int("1010", 2)      # 10   （二进制）
+>>> int("0xff", 0)      # 255  （base=0 时从字面量前缀自动推断：0x→16, 0o→8, 0b→2）
+
+# 模式 3：无参数——返回 0
+>>> int()               # 0
+```
+
+> **`base=0` 的妙用**：传 `base=0` 时，Python 从字符串前缀自动推断进制——`"0x"` 为 16 进制，`"0o"` 为 8 进制，`"0b"` 为 2 进制，无前缀为 10 进制。这在解析用户输入或配置文件时尤其方便。
+
+**`float()`** — 两种构造模式：
+
+```
+float(x=0.0)
+```
+
+| 参数 | 类型 | 说明 |
+|------|------|------|
+| `x` | `int \| float \| str \| bytes \| bytearray` | 要转换的数值或字符串；省略返回 `0.0` |
+
+```python
+>>> float(42)               # 42.0
+>>> float("3.14")           # 3.14
+>>> float("  -2.5e-3  ")    # -0.0025  （自动 trim，支持科学计数法）
+>>> float("inf")            # inf      （无穷大）
+>>> float("-inf")           # -inf
+>>> float("nan")            # nan
+>>> float()                 # 0.0
+```
+
+**`complex()`** — 三种构造模式：
+
+```
+complex(real=0, imag=0)
+complex(string)
+```
+
+| 参数 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| `real` | `int \| float \| str` | `0` | 实部；如果传字符串则整体解析 |
+| `imag` | `int \| float` | `0` | 虚部（不能与字符串同时使用） |
+
+```python
+# 模式 1：分别指定实部和虚部
+>>> complex(3, 4)           # (3+4j)
+>>> complex(3.0)            # (3+0j)——imag 默认为 0
+
+# 模式 2：从字符串解析（注意：字符串中不能有空格！）
+>>> complex("3+4j")         # (3+4j)
+>>> complex("1j")           # 1j
+
+# ❌ 常见错误：字符串中包含空格
+>>> complex("3 + 4j")       # ValueError
+
+# 模式 3：无参数
+>>> complex()               # 0j
+```
+
+> **`complex()` 与 `real`+`imag` 的区别**：`complex(3, 4)` 和 `complex("3+4j")` 结果相同，但前者不涉及字符串解析。当 `real` 参数是字符串时，`imag` 参数必须省略——这是常见的使用陷阱。
+
+**`bool()`**：
+
+```
+bool(x=False)
+```
+
+`bool(x)` 调用 `x.__bool__()`，若未定义则回退到 `x.__len__()`，两者都没有则返回 `True`。详见 4.4.3 节（逻辑运算符）的真值测试规则。
 
 ```python
 >>> issubclass(bool, int)
@@ -299,6 +392,39 @@ math.prod([1,2,3,4,5])  # 120  （3.8+）
 
 在 Python 中，字符串是一切文本处理的核心。`str` 是不可变的 Unicode 字符序列。
 
+### 3.2.0 `str()` 构造函数签名
+
+`str()` 是 Python 中最频繁调用的内置函数之一，它的多重重载覆盖了各种"转字符串"场景：
+
+```
+str()
+str(object='')
+str(object, encoding='utf-8', errors='strict')
+```
+
+| 参数 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| `object` | `Any` | `''` | 要转换的对象（省略时返回空串 `""`） |
+| `encoding` | `str` | `'utf-8'` | 仅当 `object` 为 `bytes`/`bytearray` 时使用，指定解码编码 |
+| `errors` | `str` | `'strict'` | 解码错误处理：`'strict'`（抛错）、`'ignore'`（静默跳过）、`'replace'`（替换为 `�`） |
+
+```python
+# 模式 1：无参数——返回空字符串
+>>> str()                        # ""
+
+# 模式 2：任意对象 → 字符串（调用 object.__str__() 或 object.__repr__()）
+>>> str(42)                      # "42"
+>>> str(3.14)                    # "3.14"
+>>> str([1, 2, 3])              # "[1, 2, 3]"
+>>> str(None)                    # "None"
+
+# 模式 3：bytes + 编码 → 字符串（解码）
+>>> str(b"hello", "utf-8")       # "hello"
+>>> str(b"\xff", "utf-8", "replace")   # "�"（非法字节被替换）
+```
+
+> **调用链**：`str(obj)` 首先调用 `obj.__str__()`；如果未定义，回退到 `obj.__repr__()`；如果均未定义，继承自 `object` 的 `__repr__` 返回形如 `<__main__.Foo object at 0x...>` 的默认字符串。
+
 ### 3.2.1 字面量与引号
 
 ```python
@@ -450,6 +576,22 @@ Point = namedtuple('Point', 'x y')
 
 #### 搜索与定位
 
+**`str.find()` 和 `str.index()` 方法签名**：
+
+```
+s.find(sub)
+s.find(sub, start)
+s.find(sub, start, end)
+```
+
+| 参数 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| `sub` | `str` | — | 要搜索的子串 |
+| `start` | `int` | `0` | 搜索的起始索引（包含） |
+| `end` | `int` | `len(s)` | 搜索的结束索引（不包含） |
+
+`index()` 签名与 `find()` 完全相同——唯一区别在失败行为：`find()` 返回 `-1`，`index()` 抛 `ValueError`。
+
 ```python
 s.find(sub, start, end)     # 返回首次出现索引，未找到 -1
 s.rfind(sub)                # 从右搜索
@@ -530,6 +672,17 @@ s.casefold()        # 激进小写（比 lower 更强，适合不区分大小写
 
 #### 修剪与填充
 
+**`str.strip()` 方法签名**：
+
+```
+s.strip()
+s.strip(chars)
+```
+
+| 参数 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| `chars` | `str \| None` | `None` | 要从两端删除的**字符集合**（非子串！）；为 `None` 时删除所有 ASCII 空白字符（空格、`\t`、`\n`、`\r` 等） |
+
 ```python
 s.strip(chars)      # 去除两侧指定字符（默认空白）
 s.lstrip(chars)     # 只去左侧
@@ -548,6 +701,19 @@ s.rjust(n, fill)    # 右对齐
 ```
 
 #### 拆分与连接
+
+**`str.split()` 方法签名**：
+
+```
+s.split()
+s.split(sep)
+s.split(sep, maxsplit)
+```
+
+| 参数 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| `sep` | `str \| None` | `None` | 分隔符；为 `None` 时按任意连续空白字符拆分（且自动去除首尾空白） |
+| `maxsplit` | `int` | `-1`（不限） | 最多拆分次数。`rsplit()` 的 `maxsplit` 同理，但从右侧计数 |
 
 ```python
 s.split(sep, maxsplit)      # 按分隔符拆分 → list
@@ -620,10 +786,36 @@ table = str.maketrans('aeiou', '12345')
 
 #### 编码与解码
 
+**`str.encode()` 和 `bytes.decode()` 方法签名**：
+
+```
+str.encode(encoding='utf-8', errors='strict')
+bytes.decode(encoding='utf-8', errors='strict')
+```
+
+| 参数 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| `encoding` | `str` | `'utf-8'` | 字符编码格式（如 `'utf-8'`、`'gbk'`、`'latin-1'`） |
+| `errors` | `str` | `'strict'` | 错误处理策略 |
+
+**`errors` 参数的可选值**：
+
+| 值 | 行为 | 适用场景 |
+|------|------|---------|
+| `'strict'` | 遇到无法编码/解码的字符时抛 `UnicodeError` | 默认——数据应是干净的 |
+| `'ignore'` | 静默跳过无法处理的字符 | 数据清洗——丢弃噪音 |
+| `'replace'` | 替换为 `?`（编码）或 `�`（解码） | 数据清洗——保留占位 |
+| `'xmlcharrefreplace'` | 替换为 XML 数字字符引用（仅编码） | HTML/XML 输出 |
+| `'backslashreplace'` | 替换为 `\uXXXX` 转义序列（仅编码） | 调试/日志 |
+| `'surrogateescape'` | 将无效字节编码为代理码点，可无损还原（仅解码） | 操作系统文件名处理 |
+
 ```python
-"hello".encode('utf-8')             # str → bytes
-b"hello".decode('utf-8')             # bytes → str
-"café".encode('utf-8')              # b'caf\xc3\xa9'
+>>> "hello".encode('utf-8')                     # b'hello'
+>>> "café".encode('utf-8')                      # b'caf\xc3\xa9'
+>>> "café".encode('ascii', errors='ignore')     # b'caf'（é 被静默跳过！）
+>>> "café".encode('ascii', errors='replace')    # b'caf?'（é 被替换为 ?）
+>>> b"caf\xc3\xa9".decode('utf-8')              # 'café'
+>>> b"hello".decode('utf-8')                    # 'hello'
 ```
 
 > **黄金法则**：编码用 `str.encode()`，解码用 `bytes.decode()`。牢记 str 是 Unicode 文本，bytes 是原始字节。
@@ -782,11 +974,26 @@ Python 索引从 0 开始：
 
 #### 创建
 
+**`list()` 构造函数签名**：
+
+```
+list()
+list(iterable)
+```
+
+| 参数 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| `iterable` | `Iterable` | — | 任何可迭代对象（省略时返回空列表） |
+
+`list()` 的行为本质上是对传入的可迭代对象做**热切求值**——它会立即遍历整个可迭代对象，将所有元素收集到一个新的列表对象中。这意味着 `list(range(10**9))` 会尝试分配约 8GB 内存，务必小心。
+
 ```python
-[]                              # 空列表
+[]                              # 空列表（最快）
 [1, 2, 3]                       # 字面量
-list()                          # 构造空列表
+list()                          # 构造空列表（同 []）
 list("hello")                   # 从可迭代对象 → ['h','e','l','l','o']
+list(range(5))                  # 从 range → [0, 1, 2, 3, 4]
+list({'a': 1, 'b': 2})         # 从字典（取键）→ ['a', 'b']
 [0] * 5                         # [0, 0, 0, 0, 0]  但注意下面这个坑
 ```
 
@@ -844,11 +1051,27 @@ del lst[i:j:k]  # 删除带步长切片
 
 #### 排序
 
-```python
-lst.sort(key=None, reverse=False)   # 原地排序（改变自身，返回 None）
-lst.reverse()                        # 原地反转（返回 None）
-sorted(iterable, key=..., reverse=...)# 返回新排序列表
+**`list.sort()` 方法签名**：
+
 ```
+lst.sort(*, key=None, reverse=False)
+```
+
+**`sorted()` 内置函数签名**：
+
+```
+sorted(iterable, *, key=None, reverse=False)
+```
+
+两者的参数完全相同——唯一的区别：`sort()` 是**原地排序**（修改自身，返回 `None`），`sorted()` 返回**新列表**（原数据不变）。
+
+| 参数 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| `iterable` | `Iterable` | — | （仅 `sorted`）要排序的可迭代对象 |
+| `key` | `Callable` | `None` | 单参数函数——排序前对每个元素调用一次，按其返回值比较 |
+| `reverse` | `bool` | `False` | `True` 时降序排列 |
+
+> 注意 `*` 是 Python 3 的语法标记——`key` 和 `reverse` 必须用**关键字参数**传递，不能按位置传参。
 
 **`sort()` 返回 `None`**——这是一个著名设计选择（令 API 一致——所有原地修改的方法均返回 `None`）：
 
@@ -940,12 +1163,23 @@ list(map(lambda x: x * 2, filter(lambda x: x % 2 == 0, range(10))))
 
 元组是**不可变、有序、可重复**的异构序列。
 
+**`tuple()` 构造函数签名**：
+
+```
+tuple()
+tuple(iterable)
+```
+
+与 `list()` 完全对称——对传入的可迭代对象做热切求值，返回一个不可变的元组。
+
 ```python
-()                  # 空元组
+()                  # 空元组（最快）
 (1,)                # 单元素——逗号是关键！（不是括号）
 (1, 2, 3)           # 多元素
 1, 2, 3             # 括号可省略（打包）
+tuple()             # 构造空元组
 tuple([1, 2, 3])    # 从可迭代对象构造
+tuple("hello")      # ('h', 'e', 'l', 'l', 'o')
 ```
 
 **单元素元组的陷阱**：必须保留逗号：
@@ -1027,17 +1261,39 @@ t.index(x)      # x 首次索引位置
 
 #### 创建
 
-```python
-range(stop)              # 0 到 stop-1
-range(start, stop)       # start 到 stop-1
-range(start, stop, step) # start 到 stop-1，步长 step
+**`range()` 构造函数签名**——三种调用形式：
+
+```
+range(stop)
+range(start, stop)
+range(start, stop, step)
 ```
 
+| 参数 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| `start` | `int` | `0` | 起始值（包含） |
+| `stop` | `int` | —（必填*） | 结束值（不包含） |
+| `step` | `int` | `1` | 步长（不能为 0） |
+
+> \* 仅传入一个参数时，它被解释为 `stop`（此时 `start` 默认为 0）。
+
 ```python
->>> range(5)              # range(0, 5)
->>> range(2, 8)           # range(2, 8)
->>> range(0, 10, 2)       # range(0, 10, 2)
->>> range(10, 0, -1)      # range(10, 0, -1)  反向递减
+>>> range(5)              # range(0, 5)    —— stop=5, start=0, step=1
+>>> range(2, 8)           # range(2, 8)    —— start=2, stop=8, step=1
+>>> range(0, 10, 2)       # range(0, 10, 2)—— start=0, stop=10, step=2
+>>> range(10, 0, -1)      # range(10, 0, -1)——反向递减
+```
+
+**参数约束**：
+- `step` 不能为 `0`——会抛 `ValueError: range() arg 3 must not be zero`
+- `start`、`stop`、`step` 必须是整数（`int` 或任何实现了 `__index__` 的对象）——浮点数不行
+- 当 `step > 0` 且 `start >= stop` 时，range 为空（长度为 0）
+- 当 `step < 0` 且 `start <= stop` 时，range 为空
+
+```python
+>>> range(5, 2)           # range(5, 2)——空 range（start > stop 且 step > 0）
+>>> list(range(5, 2))     # []
+>>> list(range(2, 8, -1)) # []——空 range（start < stop 且 step < 0）
 ```
 
 #### `range` 的序列行为
@@ -1084,22 +1340,47 @@ range(start, stop, step) # start 到 stop-1，步长 step
 
 `bytes` 是不可变的字节序列（0–255），`bytearray` 是其可变版本。两者与 `str` 密切相关——`str` 通过编码转为 `bytes`，`bytes` 通过解码转为 `str`。
 
-```python
->>> b = b"hello"              # bytes 字面量（仅 ASCII 字符）
->>> b = bytes([72, 101])      # 从整数列表 → b'He'
->>> b = "中文".encode("utf-8") # str → bytes（编码）
->>> b.decode("utf-8")          # bytes → str（解码）→ "中文"
->>> b[0]                       # 118（返回整数，不是 bytes！）
->>> b[:2]                      # b'he'（切片返回 bytes）
+**`bytes()` 构造函数签名**——三种构造模式：
+
+```
+bytes()                        # 空 bytes
+bytes(iterable_of_ints)        # 从 0–255 整数序列
+bytes(bytes_like)              # 从 bytes-like 对象（buffer 协议）
+bytes(string, encoding, errors='strict')  # 从字符串编码
 ```
 
-**`bytearray` 的可变操作**：
+| 参数 | 说明 |
+|------|------|
+| 无参数 | 返回空 `bytes` 对象 `b""` |
+| `iterable_of_ints` | 每个元素必须是 0–255 的整数 |
+| `bytes_like` | 任何实现了 buffer 协议的对象（如 `bytes`、`bytearray`、`memoryview`） |
+| `string` + `encoding` | 按指定编码将字符串转为字节，`errors` 控制非法字符的处理（`'strict'`/`'ignore'`/`'replace'`） |
+
+**`bytearray()` 构造函数签名**——参数同 `bytes()`，但返回可变对象：
+
+```
+bytearray()
+bytearray(iterable_of_ints)
+bytearray(bytes_like)
+bytearray(string, encoding, errors='strict')
+bytearray(size)                # 创建指定长度的零填充 bytearray
+```
 
 ```python
+# bytes——不可变
+>>> b = b"hello"                # 字面量（仅 ASCII 字符）
+>>> b = bytes([72, 101])       # 从整数列表 → b'He'
+>>> b = "中文".encode("utf-8")  # str → bytes（编码）
+>>> b.decode("utf-8")           # bytes → str（解码）→ "中文"
+>>> b[0]                        # 118（返回整数，不是 bytes！）
+>>> b[:2]                       # b'he'（切片返回 bytes）
+
+# bytearray——可变
 >>> ba = bytearray(b"hello")
->>> ba[0] = 72                 # 赋单个整数（0–255）
->>> ba.append(33)              # 追加
->>> ba                         # bytearray(b'Hello!')
+>>> ba[0] = 72                  # 赋单个整数（0–255）
+>>> ba.append(33)               # 追加
+>>> ba                          # bytearray(b'Hello!')
+>>> ba2 = bytearray(10)         # 创建 10 字节的零填充 → bytearray(b'\x00'*10)
 ```
 
 **关键区别速览**：
@@ -1184,27 +1465,275 @@ NameError: name 'x' is not defined
 
 #### 创建
 
+`dict()` 是 Python 中**构造模式最丰富的内置类型之一**——它支持三种截然不同的构造方式，理解它们各自的适用场景能极大简化代码。
+
+**`dict()` 构造函数签名**——三种重载形式：
+
+```
+dict()                          # (1) 空字典
+dict(**kwargs)                  # (2) 关键字参数
+dict(mapping, **kwargs)         # (3a) 从映射对象
+dict(iterable, **kwargs)        # (3b) 从可迭代对象（键值对序列）
+```
+
+注意所有重载中的 `**kwargs` 是可选的——它可以在任何模式下提供额外的键值覆写。
+
+---
+
+**模式 1：关键字参数（Keyword Arguments）**
+
+```
+dict(**kwargs)
+```
+
+这是最"Pythonic"的构造方式——键自动作为字符串，无需引号包裹，适合键为合法标识符的场景：
+
 ```python
-{}                              # 空字典
-{'a': 1, 'b': 2}                # 字面量
-dict(a=1, b=2)                  # 关键字参数
-dict([('a', 1), ('b', 2)])      # 从可迭代的键值对
-dict(zip(['a', 'b'], [1, 2]))   # 从两个序列
-{a: a ** 2 for a in range(5)}   # 字典推导式
+>>> dict(name="Alice", age=25, active=True)
+{'name': 'Alice', 'age': 25, 'active': True}
+
+# 参数名成为键，参数值成为值——键必须是合法的 Python 标识符
+```
+
+| 优点 | 限制 |
+|------|------|
+| 简洁、可读性极高 | 键必须是合法 Python 标识符（不能有空格、特殊字符、数字开头） |
+| IDE 自动补全友好 | 键名数量固定（不能是动态的） |
+| 无引号噪音 | 键始终是字符串 |
+
+```python
+# ❌ 不能用于非标识符键
+>>> dict(area-code="415")          # SyntaxError——连字符不是合法标识符
+>>> dict(42="answer")              # SyntaxError——数字开头不合法
+>>> dict(class="CS101")            # 合法但不推荐——class 是关键字（Python 允许但易混淆）
+```
+
+---
+
+**模式 2：从映射对象（Mapping）**
+
+```
+dict(mapping, **kwargs)
+```
+
+传入一个实现了 `Mapping` 协议的对象（如 `dict`、`OrderedDict`、`defaultdict` 等），创建其浅拷贝：
+
+```python
+>>> original = {'a': 1, 'b': 2}
+>>> dict(original)                           # {'a': 1, 'b': 2}——浅拷贝
+>>> dict(original, c=3, d=4)                 # {'a': 1, 'b': 2, 'c': 3, 'd': 4}——拷贝并追加
+
+# 任何映射类型都适用
+>>> from collections import OrderedDict
+>>> od = OrderedDict([('first', 1), ('second', 2)])
+>>> dict(od)                                 # {'first': 1, 'second': 2}
+```
+
+> `dict(mapping)` 做的是**浅拷贝**——值对象本身不被复制，两个字典指向相同的值对象。对可变对象值的修改会同时反映在两边。
+
+---
+
+**模式 3：从可迭代对象（Iterable of Pairs）**
+
+```
+dict(iterable, **kwargs)
+```
+
+这是最灵活的方式——接受任意可迭代对象，其中每个元素是一个长度为 2 的键值对（`(key, value)`）：
+
+```python
+# 字面量列表
+>>> dict([('a', 1), ('b', 2), ('c', 3)])
+{'a': 1, 'b': 2, 'c': 3}
+
+# zip() 并行的列表
+>>> dict(zip(['a', 'b', 'c'], [1, 2, 3]))
+{'a': 1, 'b': 2, 'c': 3}
+
+# 生成器表达式（动态生成键值对）
+>>> dict((str(i), i**2) for i in range(4))
+{'0': 0, '1': 1, '2': 4, '3': 9}
+
+# enumerate 的数字索引作为键
+>>> dict(enumerate(['apple', 'banana', 'cherry']))
+{0: 'apple', 1: 'banana', 2: 'cherry'}
+
+# 追加额外的键值覆写
+>>> dict([('a', 1), ('b', 2)], c=3, d=4)
+{'a': 1, 'b': 2, 'c': 3, 'd': 4}
+```
+
+| 优点 | 注意事项 |
+|------|---------|
+| 键名无标识符限制（可以是数字、带空格、特殊字符） | 语法比关键字参数啰嗦 |
+| 键值对可以动态生成（生成器、函数调用） | 每个元素必须是恰好 2 个元素的迭代对 |
+| 适合从 `zip`、`enumerate`、API 返回值构造 | 重复键以后出现的为准 |
+
+---
+
+**三种模式的对比总结**：
+
+```python
+# 同一个字典——三种写法
+
+# 写法 1：关键字参数（最简洁，键必须是标识符）
+d1 = dict(name="Alice", age=25)
+
+# 写法 2：从映射（浅拷贝 + 覆写）
+d2 = dict({'name': 'Alice'}, age=25)
+
+# 写法 3：从可迭代对象（最灵活，键无限制）
+d3 = dict([('name', 'Alice'), ('age', 25)])
+
+# 三者结果完全相同
+>>> d1 == d2 == d3
+True
+```
+
+**决策树**：选择哪种模式？
+
+```
+dict() 的三种构造模式——何时用哪个？
+
+├─ 键都是合法标识符，且在代码编写时就确定？
+│   └─ → 关键字参数：dict(name="Alice", age=25)
+│
+├─ 已有另一个字典/映射对象，想复制或在此基础上扩展？
+│   └─ → 映射：dict(existing_dict, extra_key=value)
+│
+├─ 键是动态的、非标识符（如数字、含空格）、或来自 zip/filter 等？
+│   └─ → 可迭代对象：dict(zip(keys, values))
+│
+└─ 实际建议：最常用的是字面量 {} 和关键字参数两种
+```
+
+**字面量与推导式**（最快的创建方式）：
+
+```python
+{}                              # 空字典（比 dict() 快——不涉及函数调用）
+{'a': 1, 'b': 2}                # 字面量（键已知时首选）
+{a: a ** 2 for a in range(5)}   # 字典推导式（动态生成）
 ```
 
 #### 访问与修改
 
+这里集中了字典日常使用最频繁的方法，理解它们精确的签名是写出健壮字典操作代码的关键。
+
 ```python
-d[key]          # 取值（KeyError 若键不存在）
-d.get(key, default)  # 安全取值（默认 None，不抛异常）
+d[key]              # 取值（KeyError 若键不存在）
+d.get(key, default) # 安全取值（默认 None，不抛异常）
 d.setdefault(key, default)  # 取值，若不存在则设置并返回默认值
-d[key] = value  # 设值/改值
-d.update(other) # 合并其他字典（other 覆盖 d 的同名键）
-del d[key]      # 删除键（KeyError 若键不存在）
-d.pop(key, default)  # 删除并返回值（KeyError 若键不存在且未提供 default）
-d.popitem()     # 删除并返回最后一个键值对（LIFO），3.7+ 移除的是最后插入项
-d.clear()       # 清空
+d[key] = value      # 设值/改值
+d.update(other)     # 合并其他字典（other 覆写 d 同名键）
+del d[key]          # 删除键（KeyError 若键不存在）
+d.pop(key, default) # 删除并返回值（KeyError 若键不存在且未提供 default）
+d.popitem()         # 删除并返回最后一个键值对（LIFO），3.7+ 移除的是最后插入项
+d.clear()           # 清空
+```
+
+**关键方法签名详解**：
+
+**`dict.get(key, default=None)`**
+
+```
+d.get(key)
+d.get(key, default)
+```
+
+这是防御性取值的第一选择——键存在时返回值，不存在时返回 `default`（默认 `None`），**从不抛 `KeyError`**。
+
+```python
+>>> d = {'a': 1}
+>>> d.get('a')            # 1        （键存在，返回对应的值）
+>>> d.get('z')            # None     （键不存在，返回 default 的默认值 None）
+>>> d.get('z', 0)         # 0        （键不存在，返回指定的默认值）
+>>> d.get('a', 999)       # 1        （键存在，忽略 default！）
+```
+
+> **`d.get(key)` ≠ `d[key]`**：前者是安全的查询（不抛异常），后者在键不存在时抛 `KeyError`。在不确定键是否存在时，始终用 `get`。
+
+**`dict.setdefault(key, default=None)`**
+
+```
+d.setdefault(key)
+d.setdefault(key, default)
+```
+
+这是字典中**最容易被误解**的方法——它是 `get` 和 `set` 的原子融合：
+
+1. 如果 `key` 存在 → 返回其对应的值（**不修改字典**）
+2. 如果 `key` 不存在 → **插入** `d[key] = default`，然后返回 `default`
+
+```python
+>>> d = {'a': 1}
+>>> d.setdefault('a', 999)     # 1        （a 已存在，不修改，返回现有值）
+>>> d                           # {'a': 1} （字典未变！）
+>>> d.setdefault('b', 42)      # 42       （b 不存在，插入并返回默认值）
+>>> d                           # {'a': 1, 'b': 42}
+>>> d.setdefault('c')           # None     （不传 default 时默认为 None）
+>>> d                           # {'a': 1, 'b': 42, 'c': None}
+```
+
+`setdefault` 的核心价值在于**嵌套字典的单行初始化**：
+
+```python
+# ❌ 传统写法——冗长
+tree = {}
+if 'a' not in tree:
+    tree['a'] = {}
+if 'b' not in tree['a']:
+    tree['a']['b'] = {}
+tree['a']['b']['c'] = 42
+
+# ✅ setdefault——一行搞定
+tree = {}
+tree.setdefault('a', {}).setdefault('b', {})['c'] = 42
+```
+
+**`dict.update()` — 与 `dict()` 对称的三重载**
+
+`update()` 的参数规则与 `dict()` 构造函数完全相同：
+
+```
+d.update(mapping)           # 从映射对象合并
+d.update(iterable)           # 从键值对可迭代对象合并
+d.update(**kwargs)           # 从关键字参数合并
+```
+
+```python
+>>> d = {'a': 1, 'b': 2}
+
+# 模式 1：从映射
+>>> d.update({'b': 20, 'c': 30})          # {'a': 1, 'b': 20, 'c': 30}
+
+# 模式 2：从键值对可迭代对象
+>>> d.update([('d', 40), ('e', 50)])      # {'a': 1, 'b': 20, 'c': 30, 'd': 40, 'e': 50}
+
+# 模式 3：从关键字参数
+>>> d.update(f=60, g=70)                  # {... 'f': 60, 'g': 70}
+
+# 混合使用
+>>> d.update({'x': 99}, y=100, z=101)     # mapping + kwargs
+```
+
+> `update` 遵循"后来者居上"原则——如果同一个键出现多次，**最后一次**的值生效。
+
+**`dict.pop(key, default)`**
+
+```
+d.pop(key)
+d.pop(key, default)
+```
+
+删除指定键并返回其值。如果键不存在：
+- 提供了 `default` → 返回 `default`（**不抛异常**）
+- 没提供 `default` → 抛 `KeyError`
+
+```python
+>>> d = {'a': 1, 'b': 2}
+>>> d.pop('a')            # 1     （删除并返回）
+>>> d.pop('z', None)      # None  （不存在，返回默认值——安全）
+>>> d.pop('z')            # KeyError! （不存在且无默认值）
 ```
 
 **`get` 还是 `setdefault`？**
@@ -1321,10 +1850,22 @@ c['z']              # 0（不存在的键；不同于普通 dict 的 KeyError）
 
 #### 创建
 
+**`set()` 构造函数签名**：
+
+```
+set()
+set(iterable)
+```
+
+| 参数 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| `iterable` | `Iterable` | — | 任何可迭代对象（省略时返回空集合） |
+
 ```python
 set()                       # 空集合（注意：{} 是空字典！）
-{1, 2, 3}                   # 字面量
+{1, 2, 3}                   # 字面量（最快）
 set([1, 2, 3, 2, 1])        # 从可迭代对象去重 → {1, 2, 3}
+set("hello")                # {'h', 'e', 'l', 'o'}——每个字符去重
 {x * 2 for x in range(5)}   # 集合推导式
 ```
 
@@ -1398,6 +1939,15 @@ s.symmetric_difference_update(other)  # 等价于 s ^= other
 ### 3.4.3 `frozenset`：不可变集合
 
 `frozenset` 是可哈希的不可变集合——可作为字典键或集合元素。
+
+**`frozenset()` 构造函数签名**：
+
+```
+frozenset()
+frozenset(iterable)
+```
+
+与 `set()` 签名完全一致——但对传入的可迭代对象做热切求值后返回**不可变**集合（因此可哈希，无原地修改方法）。
 
 ```python
 >>> fs = frozenset([1, 2, 3])
