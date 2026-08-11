@@ -23,6 +23,10 @@ practice_env/
 *.swo
 *~
 
+# Project-specific (local only, do not share)
+CLAUDE.md
+.claude/
+
 # OS
 .DS_Store
 Thumbs.db
