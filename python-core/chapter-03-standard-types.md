@@ -34,11 +34,11 @@ int(x, base=10)
 
 | 参数 | 类型 | 默认值 | 说明 |
 |------|------|--------|------|
-| `x` | `int \| float \| str \| bytes \| bytearray` | `0` | 要转换的数值/字符串；省略则返回 `0` |
-| `base` | `int` | `10` | 进制（2–36），仅在 `x` 为 `str`/`bytes` 时有效 |
+| `x` | `int | float | str | bytes | bytearray` | `0` | 要转换的数值/字符串；省略则返回 `0` |
+| `base` | `int` | `10` | 进制（`0` 或 2–36），仅在 `x` 为 `str`/`bytes` 时有效 |
 
 ```python
-# 模式 1：从数值转换（截断，非四舍五入）
+# 模式 1：从数值转换（截断整数部分，非四舍五入）
 >>> int(3.99)           # 3
 >>> int(-3.99)          # -3
 
@@ -83,7 +83,7 @@ complex(string)
 
 | 参数 | 类型 | 默认值 | 说明 |
 |------|------|--------|------|
-| `real` | `int | float | str` | `0` | 实部；如果传字符串则整体解析 |
+| `real` | `int | float | complex | str` | `0` | 实部；如果传字符串则整体解析 |
 | `imag` | `int | float` | `0` | 虚部（不能与字符串同时使用） |
 
 ```python
@@ -397,9 +397,8 @@ math.prod([1,2,3,4,5])  # 120  （3.8+）
 `str()` 是 Python 中最频繁调用的内置函数之一，它的多重重载覆盖了各种"转字符串"场景：
 
 ```
-str()
 str(object='')
-str(object, encoding='utf-8', errors='strict')
+str(object=b'', encoding='utf-8', errors='strict')
 ```
 
 | 参数 | 类型 | 默认值 | 说明 |
@@ -580,9 +579,7 @@ Point = namedtuple('Point', 'x y')
 **`str.find()` 和 `str.index()` 方法签名**：
 
 ```
-s.find(sub)
-s.find(sub, start)
-s.find(sub, start, end)
+s.find(sub[, start[, end]])
 ```
 
 | 参数 | 类型 | 默认值 | 说明 |
@@ -676,8 +673,7 @@ s.casefold()        # 激进小写（比 lower 更强，适合不区分大小写
 **`str.strip()` 方法签名**：
 
 ```
-s.strip()
-s.strip(chars)
+s.strip([chars])
 ```
 
 | 参数 | 类型 | 默认值 | 说明 |
@@ -706,9 +702,7 @@ s.rjust(n, fill)    # 右对齐
 **`str.split()` 方法签名**：
 
 ```
-s.split()
-s.split(sep)
-s.split(sep, maxsplit)
+s.split(sep=None, maxsplit=-1)
 ```
 
 | 参数 | 类型 | 默认值 | 说明 |
@@ -978,8 +972,7 @@ Python 索引从 0 开始：
 **`list()` 构造函数签名**：
 
 ```
-list()
-list(iterable)
+list([iterable])
 ```
 
 | 参数 | 类型 | 默认值 | 说明 |
@@ -1167,8 +1160,7 @@ list(map(lambda x: x * 2, filter(lambda x: x % 2 == 0, range(10))))
 **`tuple()` 构造函数签名**：
 
 ```
-tuple()
-tuple(iterable)
+tuple([iterable])
 ```
 
 与 `list()` 完全对称——对传入的可迭代对象做热切求值，返回一个不可变的元组。
@@ -1341,10 +1333,11 @@ range(start, stop, step)
 
 `bytes` 是不可变的字节序列（0–255），`bytearray` 是其可变版本。两者与 `str` 密切相关——`str` 通过编码转为 `bytes`，`bytes` 通过解码转为 `str`。
 
-**`bytes()` 构造函数签名**——三种构造模式：
+**`bytes()` 构造函数签名**——五种构造模式：
 
 ```
 bytes()                        # 空 bytes
+bytes(size)                    # 创建指定长度的零填充 bytes（bytes(5) → b'\x00\x00\x00\x00\x00'）
 bytes(iterable_of_ints)        # 从 0–255 整数序列
 bytes(bytes_like)              # 从 bytes-like 对象（buffer 协议）
 bytes(string, encoding, errors='strict')  # 从字符串编码
@@ -1353,6 +1346,7 @@ bytes(string, encoding, errors='strict')  # 从字符串编码
 | 参数 | 说明 |
 |------|------|
 | 无参数 | 返回空 `bytes` 对象 `b""` |
+| `size` | 非负整数——创建该长度的零填充 `bytes`（如 `bytes(10)` → `b'\x00'*10`） |
 | `iterable_of_ints` | 每个元素必须是 0–255 的整数 |
 | `bytes_like` | 任何实现了 buffer 协议的对象（如 `bytes`、`bytearray`、`memoryview`） |
 | `string` + `encoding` | 按指定编码将字符串转为字节，`errors` 控制非法字符的处理（`'strict'`/`'ignore'`/`'replace'`） |
@@ -1506,7 +1500,7 @@ dict(**kwargs)
 # ❌ 不能用于非标识符键
 >>> dict(area-code="415")          # SyntaxError——连字符不是合法标识符
 >>> dict(42="answer")              # SyntaxError——数字开头不合法
->>> dict(class="CS101")            # 合法但不推荐——class 是关键字（Python 允许但易混淆）
+>>> dict(class="CS101")            # SyntaxError——class 是保留字，不能作关键字参数名
 ```
 
 ---
@@ -1637,8 +1631,7 @@ d.clear()           # 清空
 **`dict.get(key, default=None)`**
 
 ```
-d.get(key)
-d.get(key, default)
+d.get(key[, default])
 ```
 
 这是防御性取值的第一选择——键存在时返回值，不存在时返回 `default`（默认 `None`），**从不抛 `KeyError`**。
@@ -1656,8 +1649,7 @@ d.get(key, default)
 **`dict.setdefault(key, default=None)`**
 
 ```
-d.setdefault(key)
-d.setdefault(key, default)
+d.setdefault(key[, default])
 ```
 
 这是字典中**最容易被误解**的方法——它是 `get` 和 `set` 的原子融合：
@@ -1719,11 +1711,10 @@ d.update(**kwargs)           # 从关键字参数合并
 
 > `update` 遵循"后来者居上"原则——如果同一个键出现多次，**最后一次**的值生效。
 
-**`dict.pop(key, default)`**
+**`dict.pop(key[, default])`**
 
 ```
-d.pop(key)
-d.pop(key, default)
+d.pop(key[, default])
 ```
 
 删除指定键并返回其值。如果键不存在：
@@ -1854,8 +1845,7 @@ c['z']              # 0（不存在的键；不同于普通 dict 的 KeyError）
 **`set()` 构造函数签名**：
 
 ```
-set()
-set(iterable)
+set([iterable])
 ```
 
 | 参数 | 类型 | 默认值 | 说明 |
@@ -1944,8 +1934,7 @@ s.symmetric_difference_update(other)  # 等价于 s ^= other
 **`frozenset()` 构造函数签名**：
 
 ```
-frozenset()
-frozenset(iterable)
+frozenset([iterable])
 ```
 
 与 `set()` 签名完全一致——但对传入的可迭代对象做热切求值后返回**不可变**集合（因此可哈希，无原地修改方法）。

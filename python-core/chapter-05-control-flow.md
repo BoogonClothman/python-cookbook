@@ -486,7 +486,7 @@ match value:
 ```
 
 对于简单字面量模式，`match`/`case` 被编译为与 `if`/`elif` 几乎相同的比较+跳转指令。但对于序列解构、类模式等复杂匹配，CPython 会生成专用的 `MATCH_SEQUENCE`、`MATCH_MAPPING`、`MATCH_KEYS` 等字节码指令（Python 3.10+），这才是 `match`/`case` 真正的底层优势。
-```
+
 
 **match 的常见陷阱**：
 
@@ -2302,17 +2302,17 @@ for x in data:
    class AlwaysTrue:
        def __bool__(self):
            return True
-
+   
    class AlwaysFalse:
        def __len__(self):
            return 0
-
+   
    class Tricky:
        def __bool__(self):
            return False
        def __len__(self):
            return 999
-
+   
    tests = [AlwaysTrue(), AlwaysFalse(), Tricky()]
    for t in tests:
        print(bool(t))
@@ -2351,7 +2351,7 @@ for x in data:
    handlers = []
    for level in ['DEBUG', 'INFO', 'WARNING', 'ERROR']:
        handlers.append(lambda msg: f"[{level}] {msg}")
-
+   
    for handler in handlers:
        print(handler("Something happened"))
    ```
@@ -2363,7 +2363,7 @@ for x in data:
    for x in data:
        for y in data:
            print(x, y, end=' | ')
-
+   
    # 版本 B
    data = iter([1, 2, 3])
    for x in data:
@@ -2405,7 +2405,7 @@ for x in data:
     ```python
     def mystery(a, b, c):
         return a and b or c
-
+    
     # 测试用例
     print(mystery(True,  True,  False))   # ?
     print(mystery(True,  False, True))    # ?
