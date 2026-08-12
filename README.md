@@ -10,7 +10,7 @@
 
 | 卷 | 主题 | 目录 | 状态 |
 |----|------|------|------|
-| 卷 1 | Python 语言核心 | `python-core/` | 🔵 进行中（1–7 章完成） |
+| 卷 1 | Python 语言核心 | `python-core/` | 🔵 进行中（1–9 章完成） |
 | 卷 2 | 科学计算与数据分析 | `data-science/` | ⚪ 规划中 |
 | 卷 3 | 机器学习 | `machine-learning/` | ⚪ 规划中 |
 | 卷 4 | 深度学习 | `deep-learning/` | ⚪ 规划中 |
@@ -33,12 +33,13 @@
 | [第7章 面向对象编程](python-core/chapter-07-oop.md) | 类与实例、方法绑定、四大特性（抽象/封装/继承/多态）、封装协议、MRO 与 super、鸭子类型/ABC/Protocol、特殊方法协议与对象生命周期、dataclass/enum/`__slots__`、设计模式（7.9 精简） |
 | [第7章配套：设计模式全景](python-core/chapter-07-design-patterns.md) | GoF 创建型/结构型/行为型模式、SOLID 原则、模式"消亡"对照表、反模式与实战 |
 | [第8章 异常处理与上下文管理器](python-core/chapter-08-exceptions-context.md) | 异常对象模型与类层次、try/except/else/finally、异常链、ExceptionGroup/`except*`、EAFP vs LBYL、with 协议与 contextlib、事务式资源管理 |
+| [第9章 文件 I/O 与序列化](python-core/chapter-09-file-io-serialization.md) | 分层 IO 体系（RawIO→缓冲→TextIO）、open() 全参数、编码/换行/缓冲、性能基准、随机访问、struct/mmap、pathlib/tempfile、pickle/json 序列化、原子写 |
 | [专题：深浅拷贝](python-core/topic-deep-shallow-copy.md) | 引用语义、is vs ==、浅/深拷贝、`__copy__`/`__deepcopy__` 协议、CPython 内存布局、七大陷阱 |
 | [附录A：Python 3 版本演进](python-core/appendix-a-python3-version-evolution.md) | 3.0→3.14 核心 PEP 与 CPython 实现揭秘 |
 
 ### 待写
 
-**必读核心**（所有方向必修）：第9章 文件 I/O 与序列化 · 第10章 模块与包管理 · 第13章 标准库精选 · 第14章 测试与调试
+**必读核心**（所有方向必修）：第10章 模块与包管理 · 第13章 标准库精选 · 第14章 测试与调试
 
 **进阶选修**（软件工程向重点，数据/AI 向可缩短）：第11章 并发与异步编程 · 第12章 元编程 · 第15章 性能优化与 C 扩展
 
@@ -81,7 +82,8 @@
 - [x] 卷1 第6章 函数：从调用约定到函数式编程
 - [x] 卷1 第7章 面向对象编程
 - [x] 卷1 第8章 异常处理与上下文管理器
-- [ ] 卷1 第9–15章（必读核心 → 进阶选修）
+- [x] 卷1 第9章 文件 I/O 与序列化
+- [ ] 卷1 第10–15章（必读核心 → 进阶选修）
 - [ ] 卷2 科学计算与数据分析
 - [ ] 卷3 机器学习
 - [ ] 卷4 深度学习
