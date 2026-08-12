@@ -1135,6 +1135,35 @@ UnboundLocalError: local variable 'count' referenced before assignment
 (20, 30)
 ```
 
+**装饰器示例：闭包的直接应用。** 装饰器本质是"**把函数当参数的工厂函数**"——它接收一个函数，返回一个包装后的函数。`@timed` 只是把 `slow = timed(slow)` 这行赋值"提前写好"的语法糖：
+
+```python
+import time
+
+def timed(func):
+    """装饰器：打印被装饰函数的执行耗时"""
+    def wrapper(*args, **kwargs):       # 闭包：捕获 func
+        start = time.perf_counter()
+        result = func(*args, **kwargs)  # 原样转发（6.3.3 参数透传）
+        print(f"{func.__name__} 耗时 {time.perf_counter() - start:.6f}s")
+        return result
+    return wrapper
+```
+
+```python
+>>> @timed                              # 语法糖：等价于 slow = timed(slow)
+... def slow():
+...     time.sleep(0.1)
+...     return "done"
+>>> slow()                              # 调用的是包装后的 slow
+slow 耗时 0.100209s                    # 耗时数值随机器而变
+'done'
+```
+
+`timed` 完全复用了本节刚学的三样东西：**闭包**（`wrapper` 捕获 `func`）、**高阶函数**（把函数当参数/返回值）、**参数透传**（6.3.3 的 `*args, **kwargs`）——没有引入任何新概念，`@` 只是换了个写法。
+
+> **衔接第 12 章**：这里只到"会写会用"。装饰器的完整体系——`functools.wraps` 保留元信息（不加它 `slow.__name__` 会变成 `wrapper`）、带参装饰器、类装饰器、栈叠顺序、与描述符/元类的联系——在第 12 章元编程展开。届时你会发现 `@property`、`@classmethod`、`@dataclass` 全是这套机制的实例。
+
 **late binding 陷阱（晚期绑定）**——循环里创建的 lambda 全部捕获**同一个**循环变量（不是各自的值）：
 
 ```python
@@ -1699,7 +1728,7 @@ StopIteration
 | 参数透传 | `def wrapper(*args, **kwargs): return f(*args, **kwargs)` 是装饰器地基，透传必须成对 |
 | 命名空间 | LEGB 查找链（Local→Enclosing→Global→Builtin）。变量归属**编译期**确定，`LOAD_FAST`/`LOAD_GLOBAL`/`LOAD_DEREF` 对应三种来源 |
 | `global`/`nonlocal` | 函数内赋值默认建局部；改全局用 `global`，改外层函数变量用 `nonlocal`。只读外层不需要声明 |
-| 闭包 | 闭包 = 函数 + cell 捕获变量，外层 `STORE_DEREF`/内层 `LOAD_DEREF`。**晚期绑定陷阱**：循环中建 lambda 捕获同一个变量，用 `lambda i=i:` 快照修复 |
+| 闭包 | 闭包 = 函数 + cell 捕获变量，外层 `STORE_DEREF`/内层 `LOAD_DEREF`。**晚期绑定陷阱**：循环中建 lambda 捕获同一个变量，用 `lambda i=i:` 快照修复。**装饰器示例**：闭包 + 高阶函数 + 参数透传的组合（细讲见第 12 章） |
 | `lambda` | 单表达式匿名函数。Guido 拒绝语句级 lambda（可读性）。选型：一行逻辑用 lambda，其余用 `def` 或可调用对象 |
 | 高阶函数 | `key=`（DSU 机制）比 `cmp` 高效且易写；`map`/`filter` 惰性、`reduce` 在 `functools`；`partial` 部分应用。**推导式优先于 map/filter** |
 | 纯函数 | 纯函数可测/可缓存/可并发。函数式风格 = 写纯函数，副作用收敛到 I/O 边界 |
