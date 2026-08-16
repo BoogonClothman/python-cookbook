@@ -10,7 +10,7 @@
 
 | 卷 | 主题 | 目录 | 状态 |
 |----|------|------|------|
-| 卷 1 | Python 语言核心 | `python-core/` | 🔵 进行中（1–10、13 章 + 2 专题 + 附录A 完成） |
+| 卷 1 | Python 语言核心 | `python-core/` | 🔵 进行中（1–10、13、14 章 + 2 专题 + 附录A 完成） |
 | 卷 2 | 科学计算与数据分析 | `data-science/` | ⚪ 规划中 |
 | 卷 3 | 机器学习 | `machine-learning/` | ⚪ 规划中 |
 | 卷 4 | 深度学习 | `deep-learning/` | ⚪ 规划中 |
@@ -36,13 +36,14 @@
 | [第9章 文件 I/O 与序列化](python-core/chapter-09-file-io-serialization.md) | 分层 IO 体系（RawIO→缓冲→TextIO）、open() 全参数、编码/换行/缓冲、性能基准、随机访问、struct/mmap、pathlib/tempfile、pickle/json 序列化、原子写 |
 | [第10章 模块与包管理](python-core/chapter-10-modules-packages.md) | import 执行语义与字节码、importlib 流水线（PEP 451）、`__pycache__` 与 PEP 552、自定义 import 钩子、包/相对导入/命名空间包（PEP 420）、循环导入、venv 机制、pyproject.toml 打包（PEP 517/518/621）、wheel/editable（PEP 427/660）、pip/uv 与锁文件、zipapp/PEP 723 部署 |
 | [第13章 标准库精选](python-core/chapter-13-stdlib.md) | 标准库全景与选型哲学、collections（defaultdict/Counter/deque/ChainMap/bisect/heapq/array）、itertools（惰性组合）、functools（lru_cache/singledispatch）、datetime/zoneinfo（PEP 615）、math/decimal/random/secrets/statistics、subprocess（shell=False 安全）/shutil/glob、sqlite3（参数化防注入）/csv/configparser/argparse、logging（四件套/轮转/结构化）、typing（PEP 484/585/604）、隐藏宝石速查 |
+| [第14章 测试与调试](python-core/chapter-14-testing-debugging.md) | 测试哲学与金字塔、TDD、可测试性设计、unittest（断言/生命周期/subTest）、pytest（fixture 注入/parametrize/AST 断言重写）、mock（patch 使用方语义/autospec）、覆盖率与 CI 门禁、pdb 断点调试（breakpoint/post-mortem/faulthandler）、traceback 解读、cProfile/timeit、doctest |
 | [专题：深浅拷贝](python-core/topic-deep-shallow-copy.md) | 引用语义、is vs ==、浅/深拷贝、`__copy__`/`__deepcopy__` 协议、CPython 内存布局、七大陷阱 |
 | [专题：正则表达式](python-core/topic-regex.md) | 正则与自动机理论、re 模块 API、编译与缓存机制、贪婪/惰性/回溯、环视/分组/标志、灾难性回溯与性能 |
 | [附录A：Python 3 版本演进](python-core/appendix-a-python3-version-evolution.md) | 3.0→3.14 核心 PEP 与 CPython 实现揭秘 |
 
 ### 待写
 
-**必读核心**（所有方向必修）：第14章 测试与调试
+**必读核心**：✅ 全部完成（第 3–10、13、14 章）
 
 **进阶选修**（软件工程向重点，数据/AI 向可缩短）：第11章 并发与异步编程 · 第12章 元编程 · 第15章 性能优化与 C 扩展
 
@@ -86,8 +87,9 @@
 - [x] 卷1 第9章 文件 I/O 与序列化
 - [x] 卷1 第10章 模块与包管理
 - [x] 卷1 第13章 标准库精选
+- [x] 卷1 第14章 测试与调试
 - [x] 卷1 专题：正则表达式
-- [ ] 卷1 第11、12、14、15章（必读核心 → 进阶选修）
+- [ ] 卷1 第11、12、15章（进阶选修）
 - [ ] 卷2 科学计算与数据分析
 - [ ] 卷3 机器学习
 - [ ] 卷4 深度学习
