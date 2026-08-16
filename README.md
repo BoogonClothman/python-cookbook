@@ -10,7 +10,7 @@
 
 | 卷 | 主题 | 目录 | 状态 |
 |----|------|------|------|
-| 卷 1 | Python 语言核心 | `python-core/` | 🔵 进行中（1–14 章 + 2 专题 + 附录A 完成，仅剩第15章） |
+| 卷 1 | Python 语言核心 | `python-core/` | ✅ 完成（1–15 章 + 2 专题 + 附录A） |
 | 卷 2 | 科学计算与数据分析 | `data-science/` | ⚪ 规划中 |
 | 卷 3 | 机器学习 | `machine-learning/` | ⚪ 规划中 |
 | 卷 4 | 深度学习 | `deep-learning/` | ⚪ 规划中 |
@@ -39,15 +39,16 @@
 | [第12章 元编程](python-core/chapter-12-metaprogramming.md) | 装饰器深潜（语法糖展开/工厂/wraps/类装饰器/栈）、描述符协议（数据 vs 非数据描述符、property/classmethod/staticmethod/`__slots__` 实现）、属性访问完整路径（`__getattr__`/`__getattribute__`）、元类（type 即类、class 创建流程、`__prepare__`/`__init_subclass__`、注册表/单例元类）、`__call__`/`__new__`/`__reduce__` 协议、mini-dataclass/插件注册/声明式字段实战、元编程使用边界 |
 | [第13章 标准库精选](python-core/chapter-13-stdlib.md) | 标准库全景与选型哲学、collections（defaultdict/Counter/deque/ChainMap/bisect/heapq/array）、itertools（惰性组合）、functools（lru_cache/singledispatch）、datetime/zoneinfo（PEP 615）、math/decimal/random/secrets/statistics、subprocess（shell=False 安全）/shutil/glob、sqlite3（参数化防注入）/csv/configparser/argparse、logging（四件套/轮转/结构化）、typing（PEP 484/585/604）、隐藏宝石速查 |
 | [第14章 测试与调试](python-core/chapter-14-testing-debugging.md) | 测试哲学与金字塔、TDD、可测试性设计、unittest（断言/生命周期/subTest）、pytest（fixture 注入/parametrize/AST 断言重写）、mock（patch 使用方语义/autospec）、覆盖率与 CI 门禁、pdb 断点调试（breakpoint/post-mortem/faulthandler）、traceback 解读、cProfile/timeit、doctest |
+| [第15章 性能优化与 C 扩展](python-core/chapter-15-performance-cext.md) | 解释器执行模型、五层优化路线图（算法→语言级→向量化→JIT→C）、cProfile/line_profiler/tracemalloc 进阶、复杂度优化、字节码视角（局部变量/方法绑定/join/内置函数）、3.11+ 特化解释器（PEP 659）、numpy 向量化预告、PyPy/numba、ctypes 调 C 库、Python C API（引用计数/GIL 释放/PyTypeObject）、Cython 类型化、性能回归与 CI、卷 1 全景收官 |
 | [专题：深浅拷贝](python-core/topic-deep-shallow-copy.md) | 引用语义、is vs ==、浅/深拷贝、`__copy__`/`__deepcopy__` 协议、CPython 内存布局、七大陷阱 |
 | [专题：正则表达式](python-core/topic-regex.md) | 正则与自动机理论、re 模块 API、编译与缓存机制、贪婪/惰性/回溯、环视/分组/标志、灾难性回溯与性能 |
 | [附录A：Python 3 版本演进](python-core/appendix-a-python3-version-evolution.md) | 3.0→3.14 核心 PEP 与 CPython 实现揭秘 |
 
 ### 待写
 
-**必读核心**：✅ 全部完成（第 3–10、13、14 章）
+**卷 1**：✅ 全部完成（必读核心 + 进阶选修 + 2 专题 + 附录A）
 
-**进阶选修**（软件工程向重点，数据/AI 向可缩短）：第15章 性能优化与 C 扩展
+**卷 2–5**：见下方规划（下一步：`data-science/ds-01-numpy.md`）
 
 ## 卷 2–5：规划中
 
@@ -92,8 +93,8 @@
 - [x] 卷1 第12章 元编程
 - [x] 卷1 第13章 标准库精选
 - [x] 卷1 第14章 测试与调试
+- [x] 卷1 第15章 性能优化与 C 扩展
 - [x] 卷1 专题：正则表达式
-- [ ] 卷1 第15章（进阶选修）
 - [ ] 卷2 科学计算与数据分析
 - [ ] 卷3 机器学习
 - [ ] 卷4 深度学习
