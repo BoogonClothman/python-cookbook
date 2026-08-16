@@ -10,7 +10,7 @@
 
 | 卷 | 主题 | 目录 | 状态 |
 |----|------|------|------|
-| 卷 1 | Python 语言核心 | `python-core/` | 🔵 进行中（1–9 章完成） |
+| 卷 1 | Python 语言核心 | `python-core/` | 🔵 进行中（1–9 章 + 2 专题 + 附录A 完成） |
 | 卷 2 | 科学计算与数据分析 | `data-science/` | ⚪ 规划中 |
 | 卷 3 | 机器学习 | `machine-learning/` | ⚪ 规划中 |
 | 卷 4 | 深度学习 | `deep-learning/` | ⚪ 规划中 |
@@ -35,6 +35,7 @@
 | [第8章 异常处理与上下文管理器](python-core/chapter-08-exceptions-context.md) | 异常对象模型与类层次、try/except/else/finally、异常链、ExceptionGroup/`except*`、EAFP vs LBYL、with 协议与 contextlib、事务式资源管理 |
 | [第9章 文件 I/O 与序列化](python-core/chapter-09-file-io-serialization.md) | 分层 IO 体系（RawIO→缓冲→TextIO）、open() 全参数、编码/换行/缓冲、性能基准、随机访问、struct/mmap、pathlib/tempfile、pickle/json 序列化、原子写 |
 | [专题：深浅拷贝](python-core/topic-deep-shallow-copy.md) | 引用语义、is vs ==、浅/深拷贝、`__copy__`/`__deepcopy__` 协议、CPython 内存布局、七大陷阱 |
+| [专题：正则表达式](python-core/topic-regex.md) | 正则与自动机理论、re 模块 API、编译与缓存机制、贪婪/惰性/回溯、环视/分组/标志、灾难性回溯与性能 |
 | [附录A：Python 3 版本演进](python-core/appendix-a-python3-version-evolution.md) | 3.0→3.14 核心 PEP 与 CPython 实现揭秘 |
 
 ### 待写
@@ -42,8 +43,6 @@
 **必读核心**（所有方向必修）：第10章 模块与包管理 · 第13章 标准库精选 · 第14章 测试与调试
 
 **进阶选修**（软件工程向重点，数据/AI 向可缩短）：第11章 并发与异步编程 · 第12章 元编程 · 第15章 性能优化与 C 扩展
-
-**专题**：正则表达式（形式语言与自动机 / 编译原理视角）
 
 ## 卷 2–5：规划中
 
@@ -83,6 +82,7 @@
 - [x] 卷1 第7章 面向对象编程
 - [x] 卷1 第8章 异常处理与上下文管理器
 - [x] 卷1 第9章 文件 I/O 与序列化
+- [x] 卷1 专题：正则表达式
 - [ ] 卷1 第10–15章（必读核心 → 进阶选修）
 - [ ] 卷2 科学计算与数据分析
 - [ ] 卷3 机器学习

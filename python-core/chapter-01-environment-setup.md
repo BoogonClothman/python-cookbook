@@ -1,12 +1,12 @@
 # 第1章 Python 环境搭建
 
-> **学习目标**：理解编程语言的本质与分类，掌握 Python 的设计哲学与核心特性，独立完成 Python 开发环境的搭建，并建立正确的工程习惯。
+> **学习目标**：理解编程语言的本质与分类，掌握 Python 的设计哲学与核心特性，独立完成 Python 开发环境的搭建，并建立正确的工程纪律。
 
 ---
 
 ## 1.1 认识编程语言
 
-在你写下第一行 Python 代码之前，有一个问题值得先回答：**编程语言到底是什么？**
+在你写下第一行 Python 代码之前，有一个问题应当首先回答：**编程语言到底是什么？**
 
 ### 1.1.1 什么是编程语言
 
@@ -85,7 +85,17 @@ Python 的**动态 + 强类型**组合意味着：你不需要声明类型（开
 
 **Guido van Rossum**，荷兰程序员，在 1989 年圣诞节期间开始开发 Python。当时他在荷兰国家数学与计算机科学研究中心（CWI）工作，参与 ABC 语言项目——一种面向教学设计的编程语言。ABC 虽然优雅，但缺乏文件 I/O、异常处理等实用功能。Guido 的目标是：**保 ABC 的可读性，加 C 的实用能力。**
 
-"Python"这个命名来自英国喜剧团体 Monty Python（蒙提·派森），而非蟒蛇——这就是为什么 Python 文档和社区中经常出现蒙提·派森的彩蛋（如 `spam` 和 `eggs` 作为示例变量名）。
+"Python"这个命名来自英国喜剧团体 Monty Python（蒙提·派森），而非蟒蛇——这就是为什么 Python 文档和社区中经常出现蒙提·派森以及蟒蛇的彩蛋（如 `spam` 和 `eggs` 作为示例变量名）。
+
+> ```
+> A little-known FAQ is that Python is named for Monty Python, not the snake, and that traditionally metasyntactic variables such as foo, bar etc. are frequently named after Monty Python sketches. E.g. I will frequently reference the Cheeseshop sketch, the Spanish Inquisition, Ethel the Aardvark, Spam (the lunch meat, not the email), and similar.
+> 
+> E.g. instead of foo, bar, baz, we frequently use spam, ham, eggs.
+> ```
+>
+> “一个鲜为人知的常见问题是：Python 是以蒙提·派森（Monty Python）命名的，而不是蟒蛇；而且传统上，诸如 `foo`、`bar` 之类的元句法变量，也经常以蒙提·派森短剧中的名字来命名。例如，我经常引用奶酪店（Cheeseshop）短剧、西班牙宗教法庭（Spanish Inquisition）、土豚埃塞尔（Ethel the Aardvark）、Spam（指午餐肉，不是垃圾邮件）等类似内容。
+>
+> 例如，我们经常使用 `spam`、`ham`、`eggs` 来代替 `foo`、`bar`、`baz`。”
 
 #### 关键里程碑
 
