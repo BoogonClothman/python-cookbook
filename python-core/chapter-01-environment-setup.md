@@ -6,20 +6,20 @@
 
 ## 1.1 认识编程语言
 
-在你写下第一行 Python 代码之前，有一个问题应当首先回答：**编程语言到底是什么？**
+编写第一行 Python 代码之前，首先应当解决一个问题：**编程语言是什么？**
 
 ### 1.1.1 什么是编程语言
 
-编程语言是人与计算机之间的**通信协议**——人类用它可以描述计算逻辑，计算机将它翻译为机器指令并执行。这个"翻译"机制，将编程语言分为两大阵营。
+编程语言是人与计算机之间的**通信协议**。人类利用它来描述计算逻辑，计算机将它翻译为机器指令并执行。这个"翻译"机制，将编程语言分为两大阵营。
 
 #### 从机器语言到高级语言
 
 ```
 第一代：机器语言
-  10110000 01100001          ← CPU 直接执行，但人类几乎不可读
+  10110000 01100001          ← 由CPU直接执行，人类几乎不可读
 
 第二代：汇编语言
-  MOV AL, 61h               ← 助记符替代二进制，但仍是面向硬件的
+  MOV AL, 61h                ← 助记符替代字面二进制，但仍是面向硬件的语言
 
 第三代：高级语言（C, Pascal, BASIC）
   printf("hello");           ← 接近人类思维方式，需要编译器翻译
@@ -40,34 +40,35 @@
 | 执行前步骤 | `源代码 → 编译器 → 可执行文件` | `源代码 → 解释器 → 即时执行` |
 | 运行速度 | 快（直接执行机器码） | 慢（解释器有开销） |
 | 开发速度 | 慢（编译-运行-调试循环） | 快（改完就跑） |
-| 跨平台 | 需要为每个平台编译 | 一次编写，到处运行（只要有解释器） |
+| 跨平台 | 需要为每个平台编译 | 一次编写，处处运行（只要有解释器） |
 | 典型场景 | 操作系统、游戏引擎、嵌入式 | Web 后端、数据科学、脚本自动化 |
 
-> \* 现代 JavaScript 引擎（V8、SpiderMonkey）使用 JIT 编译，实际上已非纯解释执行，这里按传统分类简化处理。
+> \* 现代 JavaScript 引擎（V8、SpiderMonkey）使用 JIT 编译，实际上并非纯解释执行，此处按传统分类简化处理。
 
-**Python 的实际情况比"解释型"这个标签更复杂**：CPython 先将源码编译为字节码（`.pyc`），再由虚拟机执行字节码。这是一种"半编译-半解释"的混合模型——接近 Java 的 JVM 架构，但省去了显式编译步骤。
+**Python 的实际情况比"解释型"这个标签更复杂**：CPython 先将源码编译为字节码（`.pyc`），再由虚拟机执行字节码。这是一种"半编译-半解释"的混合模型——接近 Java 的 JVM 架构，但节省了显式编译的步骤。
 
 ```
 Python 执行流程：
   .py 源码 → [编译器] → .pyc 字节码 → [PVM (Python 虚拟机)] → 机器执行
 ```
 
-> **工程现实**：对新手而言，"Python 是解释型语言"这句话够用。但当你开始关注性能时，你需要知道 PyPy（JIT 编译）、Cython（编译为 C 扩展）、Numba（LLVM JIT）等工具让 Python 可以在特定场景下接近甚至达到编译型语言的性能。
+> **工程现实**：对新手而言，"Python 是解释型语言"这句话就已经足够。但当你开始关注性能，你需要知道 PyPy（JIT 编译）、Cython（编译为 C 扩展）、Numba（LLVM JIT）等工具让 Python 可以在特定场景下接近甚至达到编译型语言的性能。
 
-#### 静态类型 vs 动态类型
+#### 静态类型 vs 动态类型，强类型 vs 弱类型
 
-另一个关键分类维度：
+另一个重要分类维度：
 
 ```python
 # Python：动态类型 + 强类型
 x = 42           # x 的类型是 int，但不需要声明
 x = "hello"      # x 现在可以是 str——类型随值而变（动态类型）
 x + 1            # TypeError: str + int 不允许（强类型——不会隐式"转换"）
-
+```
+```c
 # C：静态类型 + 弱类型
 int x = 42;      // x 的类型在编译时确定，不可改变
 char* y = "hi";
-x + *y;          // 可以！指针被隐式转为整数（弱类型）
+x + *y;          // 允许，指针被隐式转为整数（弱类型）
 ```
 
 | 类型系统 | 示例语言 | 含义 |
@@ -77,15 +78,15 @@ x + *y;          // 可以！指针被隐式转为整数（弱类型）
 | 动态 + 强 | **Python**, Ruby, Elixir | 运行时确定类型，禁止不安全转换 |
 | 动态 + 弱 | JavaScript, PHP | 运行时确定类型，允许隐式转换 |
 
-Python 的**动态 + 强类型**组合意味着：你不需要声明类型（开发快），但类型错误不会悄悄发生（安全）。
+Python 的**动态 + 强类型**组合的意义：不需要声明类型（开发快），而且类型错误不会静默发生（安全）。
 
 ### 1.1.2 Python 的起源与发展
 
 #### 创世纪：1989 年的圣诞节项目
 
-**Guido van Rossum**，荷兰程序员，在 1989 年圣诞节期间开始开发 Python。当时他在荷兰国家数学与计算机科学研究中心（CWI）工作，参与 ABC 语言项目——一种面向教学设计的编程语言。ABC 虽然优雅，但缺乏文件 I/O、异常处理等实用功能。Guido 的目标是：**保 ABC 的可读性，加 C 的实用能力。**
+**Guido van Rossum**，荷兰程序员，在 1989 年圣诞节期间开始开发 Python。当时的他在荷兰国家数学与计算机科学研究中心（CWI）工作，参与 ABC 语言项目（一种面向教学设计的编程语言）。ABC 虽然优雅，但缺乏文件 I/O、异常处理等实用功能。Guido 的目标是：**保持 ABC 的可读性，添加 C 的实用能力。**
 
-"Python"这个命名来自英国喜剧团体 Monty Python（蒙提·派森），而非蟒蛇——这就是为什么 Python 文档和社区中经常出现蒙提·派森以及蟒蛇的彩蛋（如 `spam` 和 `eggs` 作为示例变量名）。
+"Python"这个命名来自英国喜剧团体 Monty Python（蒙提·派森）。这也是为什么 Python 文档和社区中经常出现蒙提·派森的彩蛋（如 `spam` 和 `eggs` 作为示例变量名）。
 
 > ```
 > A little-known FAQ is that Python is named for Monty Python, not the snake, and that traditionally metasyntactic variables such as foo, bar etc. are frequently named after Monty Python sketches. E.g. I will frequently reference the Cheeseshop sketch, the Spanish Inquisition, Ethel the Aardvark, Spam (the lunch meat, not the email), and similar.
@@ -117,7 +118,7 @@ Python 的**动态 + 强类型**组合意味着：你不需要声明类型（开
 | 2024 | 3.13 | **自由线程**（无 GIL 实验性）、**JIT 编译器**（实验性）、改进 REPL |
 | 2025 | 3.14 | 注解的延迟求值（PEP 649）、性能持续提升、错误信息改进 |
 
-> **Python 3.13（2024）引入两个历史性变更**：可选的自由线程模式去掉 GIL（全局解释器锁），以及基于 copy-and-patch 的 JIT 编译器。这是 Python 诞生三十余年来最激进的变化。**Python 3.14（2025）是当前最新稳定版**，带来了注解的延迟求值（PEP 649）等改进——如果你学习 Python，3.14 是推荐的起点。
+> **Python 3.13（2024）引入两个历史性变更**：可选的自由线程模式去掉 GIL（全局解释器锁），以及基于 copy-and-patch 的 JIT 编译器。这是 Python 诞生三十余年来最激进的变化。**Python 3.14（2025）是当前最新稳定版**，带来了注解的延迟求值（PEP 649）等改进。如果你现在开始学习 Python，3.14 是推荐的起点。
 
 #### Python Software Foundation (PSF)
 
@@ -161,10 +162,9 @@ Namespaces are one honking great idea -- let's do more of those!
 
 **1. 可读性至上（Readability counts）**
 
-Python 用**缩进定义代码块**——这不是为了省 `{}`，而是强迫代码结构和视觉结构一致。没有缩进的 Python 代码是语法错误，这使得 Python 代码天然比其他语言更整洁。
+Python 用**缩进定义代码块**，强迫代码结构和视觉结构一致。没有缩进的 Python 代码是语法错误，缩进使得 Python 代码天然比其他语言视觉上更加整洁。
 
 ```python
-# 这是合法的 Python——视觉结构和逻辑结构完全一致
 if score >= 90:
     grade = 'A'
 elif score >= 80:
@@ -182,30 +182,35 @@ else:
 if not items:           # Pythonic ✓
     ...
 
-if len(items) == 0:     # Unpythonic ✗——虽然也工作
+if len(items) == 0:     # Unpythonic ✗ though it works.
     ...
 ```
 
 **3. Batteries Included（自带电池）**
 
-Python 标准库极其丰富——HTTP 客户端、JSON 解析、正则表达式、电子邮件、SQLite 数据库、XML 处理、日志系统……无需安装任何第三方包就能完成大量实际工作。这降低了新手的学习门槛，因为你不需要在学语言的同时学包管理。
+Python 标准库极其丰富：HTTP 客户端、JSON 解析、正则表达式、电子邮件、SQLite 数据库、XML 处理、日志系统等等。无需安装任何三方库就能完成大量实际工作。这显著降低了新手入门的学习门槛，你不需要在学语言之前先学习复杂的包管理。
 
 ### 1.1.4 Python 的核心特性
 
 #### 动态类型 + 强类型
 
-前面已经示例。这里补充一个重要的工程后果：
+上文已经示例。补充一个重要的工程后果：
 
 ```python
 def greet(name):
     return f"Hello, {name}"
+```
 
-# 你可以传入任何类型——运行时才检查
+你可以传入任何类型，因为运行时才检查
+
+```
 greet("Alice")      # 正常
-greet(42)           # 也正常——f-string 接受任何对象
-greet(None)         # 正常——变成 "Hello, None"
+greet(42)           # 正常，f-string 接受任何对象
+greet(None)         # 正常，变成 "Hello, None"
+```
 
-# 但如果函数内部做了字符串操作：
+但是如果函数内部做了字符串对象的操作：
+```
 def shout(name):
     return name.upper() + "!"
 
@@ -213,7 +218,7 @@ shout("Alice")      # "ALICE!"
 shout(42)           # AttributeError: 'int' object has no attribute 'upper'
 ```
 
-这种"运行时才暴露类型错误"的特性，推动了 Python 3.5 引入**类型注解**（PEP 484）和 `mypy`/`pyright` 等静态类型检查器的兴起——在不改变动态类型本质的前提下，获得静态检查的安全网。
+这种"运行时暴露类型错误"的特性，推动了 Python 3.5 引入**类型注解**（PEP 484），和 `mypy`/`pyright` 等静态类型检查器的兴起——在不改变动态类型本质的前提下，获得静态检查的安全网。
 
 ```python
 def greet(name: str) -> str:          # 类型注解（运行时完全忽略）
@@ -245,7 +250,7 @@ True
 # 函数可以作为参数传递
 sorted(words, key=str.lower)
 
-# 函数可以嵌套定义（闭包）
+# 函数可以嵌套定义（闭包函数）
 def make_multiplier(n):
     def multiplier(x):
         return x * n
@@ -257,7 +262,7 @@ MyClass = type('MyClass', (object,), {'x': 42})
 
 #### 自动内存管理
 
-Python 使用**引用计数 + 标记清除（循环检测）**实现垃圾回收：
+Python 使用 **引用计数 + 标记清除（循环检测）** 实现垃圾回收：
 
 ```python
 import sys
@@ -274,7 +279,7 @@ sys.getrefcount(a)      # 2
 # 循环引用——引用计数无法处理的场景
 lst = []
 lst.append(lst)         # lst 指向自身
-del lst                 # 引用计数仍是 1（自己引用自己）→ 由 GC 的循环检测器回收
+del lst                 # 引用计数仍是 1（自己引用自己）--> 由 GC 的循环检测器回收
 ```
 
 > **工程知识**：CPython 的 `del` 不直接调用析构函数——它只是减少引用计数。对象在引用计数归零时才被回收（`__del__` 被调用）。"循环引用导致内存泄漏"是 Python 新手到中级的第一个认知升级点。
@@ -282,13 +287,15 @@ del lst                 # 引用计数仍是 1（自己引用自己）→ 由 GC
 #### 鸭子类型
 
 > "If it looks like a duck, swims like a duck, and quacks like a duck, then it probably is a duck."
-> —— James Whitcomb Riley
+> -- _James Whitcomb Riley_
+> 
+> 如果一个东西看起来像鸭子，游起来像鸭子，叫起来也像鸭子，那他就是鸭子。
 
 Python 不关心对象的类型是什么，只关心它**能做**什么：
 
 ```python
 def read_data(source):
-    return source.read()    # 只要 source 有 read() 方法，就能工作
+    return source.read()    # source有read()方法即可
 
 # 这些都可以传入 read_data()：
 import io
@@ -297,7 +304,7 @@ data_stream = io.StringIO("hello")  # 内存流也有 read()
 data_bytes = b"world"               # bytes 对象……没有 read() → AttributeError
 ```
 
-这与 Java/C++ 等需要声明接口或基类的语言形成对比：Python 依赖**运行时行为**而非**编译时类型**来保证兼容性。优点是灵活（不需要为了复用而引入复杂的类型层级），缺点是在大型项目中可能导致难以追踪的运行时错误——这正是类型注解和静态检查器试图弥补的。
+这与 Java/C++ 等需要声明接口或基类的语言形成对比：Python 依赖**运行时行为**而非**编译时类型**来保证兼容性。优点是灵活，不需要为了复用而引入复杂的类型层级，缺点是在大型项目中可能导致难以追踪的运行时错误，而这正是类型注解和静态检查器试图弥补的。
 
 #### 缩进即语法
 
@@ -305,26 +312,26 @@ Python 可能是唯一将缩进作为语法规则的工业级语言。这引发�
 
 **缩进规则**：
 - 必须使用**一致的**缩进（全空格或全制表符，推荐 4 个空格）
-- PEP 8 强制：**空格优先**，如果用制表符也要保持与空格等价
+- PEP 8 强制：**空格优先**。
 - 同一代码块的缩进量必须严格一致
-- 缩进量可以是 1～N 个空格（但必须保持一致），PEP 8 建议 4
+- 缩进量可以是 1～N 个空格，但必须在同级代码块内保持一致，PEP 8 建议 4
 
-> **实际教训**：混用 Tab 和空格是 Python 最常见的隐形 bug 来源——代码"看起来"对齐了，但解释器认为缩进不一致。用编辑器的"显示空白字符"功能可以避免这类问题。
+> **注意**：混用 Tab 和空格是 Python 最常见的隐形 bug 来源（TabError）。现代IDE通常选择将Tab转译为一个标准缩进量。
 
 ### 1.1.5 Python 的应用生态
 
-Python 不是"什么都能做"的银弹，但它的应用广度在通用语言中无出其右：
+Python 不是"解决一切"的银弹（**No Silver Bullet**），但它的应用广度在通用语言中无出其右：
 
-| 领域 | 代表性库/框架 | Python 的地位 |
-|------|-------------|--------------|
-| **数据科学 / AI** | NumPy, Pandas, PyTorch, TensorFlow, scikit-learn | 🏆 绝对霸主 |
-| **Web 后端** | Django, FastAPI, Flask | 🥈 与 JS/Go/Java 并列 |
-| **自动化 / DevOps** | Ansible, SaltStack, Fabric | 🏆 第一选择 |
-| **科学计算** | SciPy, SymPy, AstroPy, BioPython | 🏆 替代 MATLAB |
-| **桌面 GUI** | PyQt/PySide, Tkinter, wxPython | 可用但不主流 |
-| **游戏开发** | Pygame, Godot (GDScript) | 入门/原型，非工业级 |
-| **嵌入式 / IoT** | MicroPython, CircuitPython | 快速增长 |
-| **教育** | 全球高校首选入门语言 | 🏆 无可争议 |
+| 领域 | 代表性库/框架 | Python 的地位                                          |
+|------|-------------|--------------------------------------------------------|
+| **数据科学 / AI** | NumPy, Pandas, PyTorch, TensorFlow, scikit-learn | 🏆 绝对霸主                                            |
+| **Web 后端** | Django, FastAPI, Flask | 🥈 与 JS/Go/Java 并列                                  |
+| **自动化 / DevOps** | Ansible, SaltStack, Fabric | 🏆 第一选择                                            |
+| **科学计算** | SciPy, SymPy, AstroPy, BioPython | 🏆 替代付费软件 MATLAB                                 |
+| **桌面 GUI** | PyQt/PySide, Tkinter, wxPython | 可用但不主流                                           |
+| **游戏开发** | Pygame, Godot (GDScript) | 入门/原型，非工业级                                    |
+| **嵌入式 / IoT** | MicroPython, CircuitPython | 快速增长                                               |
+| **教育** | 全球高校首选入门语言 | 🏆 无可争议，因为Python来源于针对教育场景设计的ABC语言 |
 
 **Python 的边界**：
 - ❌ **不适合**：操作系统内核、高性能游戏引擎、实时硬约束系统、移动端原生开发
@@ -399,10 +406,10 @@ Pyodide     ← 编译到 WebAssembly
 
 #### Windows
 
-**方法一：从 python.org 下载安装包（推荐）**
+**方法一：从 python.org 下载安装包**
 
-1. 访问 https://www.python.org/downloads/，下载最新稳定版（如 Python 3.14.x）
-2. **运行安装程序时，务必勾选 "Add python.exe to PATH"**（默认未勾选！）
+1. 访问 [https://www.python.org/downloads/](https://www.python.org/downloads/)，下载最新稳定版（如 Python 3.14.x）
+2. 为了保证在任何位置都可以启动Python，**运行安装程序时，务必勾选 "Add python.exe to PATH"**（默认未勾选！）
 3. 选择 "Install Now" 或 "Customize installation"
 4. 如果自定义安装，建议勾选 `pip`、`tcl/tk and IDLE`、`Python test suite`、`py launcher`
 
@@ -415,9 +422,9 @@ pip --version
 # pip 24.x from C:\Users\...\AppData\...
 ```
 
-**方法二：Microsoft Store**
+**方法二：Microsoft Store（不建议）**
 
-微软商店提供受控安装，自动加入 PATH 且自动更新。但 Store 版偶有权限限制（如 `pip install --user` 行为略有不同），开发中不如官网安装灵活。
+微软商店提供受控安装，自动加入 PATH 且自动更新。但 Store 版由于WindowsApp目录的权限限制（如 `pip install --user` 行为略有不同），开发中不如官网安装灵活。
 
 > **Windows 多版本管理**：如需在多个 Python 版本间切换，使用 `py` 启动器（随官网安装包自带）：
 >
@@ -433,7 +440,7 @@ pip --version
 
 同 Windows，访问 python.org 下载 `.pkg` 安装程序，按照向导操作。
 
-**方法二：Homebrew（开发者推荐）**
+**方法二：Homebrew**
 
 ```bash
 brew install python@3.14
@@ -481,7 +488,7 @@ sudo make altinstall     # 用 altinstall 而非 install——避免覆盖系统
 | **conda** | 全平台 | 不仅管理 Python 版本，还管理非 Python 依赖（C 库等） |
 | **asdf** | macOS/Linux | 通用多语言版本管理器（通过插件支持 Python） |
 
-**uv 入门**（2024 年爆火的新秀——由 Ruff 作者打造）：
+**uv 入门**（2024 年新秀——由 Ruff 的作者倾力打造）：
 
 ```bash
 # 安装 uv
@@ -696,14 +703,14 @@ Python 的 `pip install` 默认将包安装到**全局** site-packages 目录。
 项目 A 需要 requests==2.28.0
 项目 B 需要 requests==2.31.0
        ↓
-全局冲突！两个项目共享同一个 Python 环境。
+冲突，因为两个项目共享同一个 Python 环境。
 ```
 
 虚拟环境是**每个项目专用的隔离 Python 环境**——每个环境有自己的 site-packages，互不干扰。
 
 #### venv（Python 标准库，3.3+）
 
-`venv` 是 Python 的内置工具，零依赖，推荐作为默认选择。
+`venv` 是 Python 的内置工具，零依赖，推荐作为入门选择。
 
 ```bash
 # 创建虚拟环境
@@ -758,7 +765,7 @@ pipx install ruff
 
 #### conda / Miniconda
 
-conda 是 Anaconda 公司的跨语言包管理器，广泛应用于数据科学领域：
+conda 是 Anaconda 公司开发的的跨语言包管理器，广泛应用于数据科学领域：
 
 ```bash
 conda create -n myenv python=3.12     # 创建环境（指定 Python 版本）
@@ -771,11 +778,11 @@ conda deactivate                      # 退出
 **conda vs pip/venv**：
 - conda 同时管理 Python 版本和非 Python 的二进制依赖（如 BLAS、CUDA、ffmpeg）
 - conda 的包来自 conda-forge（而非 PyPI），由维护者预先编译
-- 如果你的工作涉及 NumPy/PyTorch/TensorFlow 等有 C 扩展的科学计算库，conda 的二进制依赖管理是很大的优势
+- 如果你的工作涉及 NumPy/PyTorch/TensorFlow 等有 C 扩展的科学计算库，conda 的预编译二进制依赖管理是很大的优势
 
-#### 现代工程实践：uv（2024 推荐关注）
+#### 现代工程实践：uv（推荐关注）
 
-`uv` 是一个用 Rust 写成的 Python 包和项目管理器，一个工具统一 `pip`、`pip-tools`、`pipx`、`pyenv`、`venv`：
+`uv` 是一个用 Rust 编写的 Python 包和项目管理器，由一个工具统一 `pip`、`pip-tools`、`pipx`、`pyenv`、`venv`：
 
 ```bash
 # 创建项目（生成 pyproject.toml + .venv）
@@ -795,21 +802,21 @@ uv sync
 uv tool install ruff
 ```
 
-> **权衡**：`uv` 的速度远超 pip（10-100x），但生态尚在快速演进中。如果你是学习阶段，从 `venv + pip` 开始完全可以；当你需要管理多个项目、或对安装速度有要求时，`uv` 值得投入。
+> **权衡**：`uv` 的速度远超 pip（10-100x），但生态尚在快速演进中。如果你是学习阶段，从 `venv + pip` 开始完全可以；当你需要管理多个项目、或对安装速度有要求时，`uv` 值得投入学习。
 
 #### 虚拟环境的最佳实践
 
-1. **每个项目一个虚拟环境**——绝不全局安装项目依赖
-2. **虚拟环境放在项目目录外**（普通 venv）或项目目录内的 `.venv` 目录中（`.venv/` 约定，`uv` 默认）
-3. **将虚拟环境路径加入 `.gitignore`**——不提交虚拟环境本身
-4. **提交依赖描述文件**（`requirements.txt` 或 `pyproject.toml` / `uv.lock`）
-5. **锁定版本**——`pip freeze > requirements.txt` 或 `uv.lock` 确保团队和部署环境依赖一致
+1. **项目即环境**：**绝对禁止**全局安装项目依赖
+2. **环境与源码目录分离**：环境在`venv`目录或 `.venv` 目录中，或者被conda独立管理
+3. **虚拟环境路径忽略**：不提交虚拟环境本身，应当进入 **.gitignore**文件被git忽略
+4. **提交依赖描述文件**：`requirements.txt` 或 `pyproject.toml` / `uv.lock`
+5. **锁定版本唯一**：`pip freeze > requirements.txt` 或 `uv.lock` 确保团队和部署环境依赖一致
 
 ### 1.2.5 开发工具
 
-#### VS Code（强烈推荐）
+#### Microsoft Visual Studio Code（VS Code，最流行的代码编辑器之一）
 
-VS Code 加上 Python 扩展是目前最流行的 Python 开发环境——免费、跨平台、启动快、生态丰富。
+VS Code 是目前最流行的 Python 开发工具之一：免费、跨平台、插件生态丰富。
 
 **安装与配置**：
 
@@ -832,34 +839,20 @@ VS Code 加上 Python 扩展是目前最流行的 Python 开发环境——免�
 | 重命名符号 | `F2` | 安全地重命名（更新所有引用） |
 | 集成终端 | `` Ctrl+` `` | 打开内置终端 |
 
-**.vscode/settings.json**（项目级推荐配置）：
 
-```json
-{
-    "[python]": {
-        "editor.defaultFormatter": "charliermarsh.ruff",
-        "editor.formatOnSave": true,
-        "editor.codeActionsOnSave": {
-            "source.organizeImports": "explicit"
-        }
-    },
-    "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
-    "python.terminal.activateEnvironment": true
-}
-```
+#### PyCharm（专业级 Python IDE）
 
-#### PyCharm（重型 IDE）
+JetBrains 开发的 PyCharm 是功能最完整的 Python IDE。自 2025.1 起，社区版与专业版合并为**单一统一产品**：
 
-JetBrains 开发的 PyCharm 是功能最完整的 Python IDE：
+- **核心功能免费**：Python 开发、调试、测试、Jupyter Notebook 支持等——无需付费
+- **Pro 订阅（付费）**：附加高级功能，如 Web 框架（Django/Flask）、数据库工具、远程开发、科学工具等
+- 安装后自动获得 30 天 Pro 免费试用，试用结束后可选择购买订阅或继续免费使用核心功能
 
-- **Community Edition**（免费）：支持纯 Python 开发、调试、测试
-- **Professional Edition**（付费）：额外支持 Web 框架（Django/Flask）、数据库工具、远程开发、科学工具
-
-**适用场景**：如果你来自 Java/C# 世界、需要重量级重构工具、或开发大型 Django 项目——PyCharm 的深度功能优于 VS Code。对于大多数学习和小中型项目，VS Code 足够且更轻量。
+**适用场景**：如果你来自 Java/C# 世界、需要重量级重构工具、或开发中大型 Django 项目，PyCharm 的专业深度远远高于 VS Code。对于入门学习和小型项目，VS Code 足够且更轻量。
 
 #### Jupyter Notebook / JupyterLab
 
-Jupyter 是**交互式文学编程**（literate programming）环境——将代码、输出、Markdown 文档、图表混合在同一个文档中。它是数据科学和数据探索的事实标准。
+Jupyter 是**交互式文学编程**（literate programming）环境——将代码、输出、Markdown 文档、图表混合在同一个文档中。它是数据科学和机器学习的事实标准。但是使用Jupyter的前提是你拥有一份支持pip的Python环境。
 
 ```bash
 pip install jupyterlab
@@ -868,11 +861,19 @@ jupyter lab      # 在浏览器中打开 JupyterLab
 
 或使用 VS Code 中的 Jupyter 扩展——在 `.ipynb` 文件中直接编辑。
 
-> **何时用 Jupyter 而非 .py 文件**：当你需要探索未知数据、可视化每一步的计算结果、编写数据分析报告时，Jupyter 是正确选择。当你在写一个需要版本控制、自动化部署、复用的生产代码时，`.py` 文件是正确选择。
+> **Jupyter or .py ?**
+>
+> 当你需要探索未知数据、可视化每一步的计算结果、编写数据分析报告时，Jupyter 是正确选择。
+>
+> 当你在写一个需要版本控制、自动化部署、复用的生产代码时，`.py` 文件是正确选择。
+>
+> 软件方向：你应该使用Python文件。
+>
+> 科研方向：你应该使用Jupyter Notebook。
 
 #### IDLE（Python 内置）
 
-IDLE 是 Python 自带的简易 IDE——不需要任何安装，打开 `python -m idlelib` 或从开始菜单启动。它适合**最初级的练习**，但不适合真实项目开发。
+IDLE 是 Python 自带的简易 IDE——不需要任何安装，打开 `python -m idlelib` 或从开始菜单启动。它适合**最简单的练习**，但不适合真实项目开发。
 
 ### 1.2.6 第一个 Python 程序
 
@@ -903,7 +904,7 @@ $ python hello.py
 # 方式 2：作为模块运行（无需 .py 后缀，用 . 代替 /）
 $ python -m hello
 
-# 方式 3：直接执行（需要 shebang + chmod +x，仅 Unix）
+# 方式 3：直接执行（需要 shebang + chmod +x，仅Unix/类Unix系统可用）
 $ ./hello.py
 ```
 
@@ -928,21 +929,21 @@ Shebang——Unix 系统用它定位解释器。Windows 忽略但无害。
 if __name__ == "__main__":
     main()
 ```
-这是 Python 的惯用写法：当此文件**被直接运行**时，`__name__` 是 `"__main__"`，执行 `main()`；当它**被 import 导入**时，`__name__` 是模块名，`main()` 不执行。这让每个 Python 文件同时是"可导入的库"和"可运行的脚本"。
+这是 Python 的一种惯用写法：当此文件**被直接运行**时，`__name__` 的值为 `"__main__"`，符合条件，执行 `main()`；当它**被 import 导入**时，`__name__` 是模块名，条件不成立，`main()` 不执行。这让 Python 文件同时是"可导入的库"和"可运行的脚本"。
 
 ### 1.2.7 编码规范基础（PEP 8）
 
-PEP 8 是 Python 官方风格指南（Style Guide for Python Code）。它解决的不是"对错"，而是"一致性"——当所有 Python 代码遵循同一套格式规则，阅读陌生代码的认知负担大幅降低。
+PEP 8 是 Python 官方编程风格指南（Style Guide for Python Code），同时也是所有Python编码规范的唯一“宪法”。它解决的不是风格的对错问题，而是一致性问题。当所有 Python 代码遵循同一套格式规则，阅读外源代码的认知负担将大幅降低。
 
 #### 命名约定
 
 ```python
-# 变量、函数、方法：snake_case（全小写，下划线分隔）
+# 变量、函数、方法：snake_case（蛇形命名法，全小写，下划线分隔）
 user_name = "Alice"
 def calculate_average(numbers):
     pass
 
-# 类：PascalCase（每个单词首字母大写）
+# 类：PascalCase（大驼峰命名法、帕斯卡命名法，每个单词首字母大写）
 class UserProfile:
     pass
 
@@ -1025,12 +1026,11 @@ if (condition_one
 #### 导入规范
 
 ```python
-# 导入顺序：标准库 → 第三方 → 本地
+# 导入顺序：标准库 → 三方库 → 本地
 import os
 import sys
 from datetime import datetime
 
-import numpy as np
 import requests
 
 from myproject.utils import helper
@@ -1039,16 +1039,17 @@ from myproject.utils import helper
 from module import *          # ❌ 污染命名空间
 
 # 过长的模块名可用 as 简化
+import numpy as np
 import matplotlib.pyplot as plt
 ```
 
 #### 注释与文档字符串
 
 ```python
-# 行内注释：与代码同级，说明"为什么"而非"做什么"
+# 行内注释：与代码同级，说明"为什么"而不是"做什么"
 count = count + 1  # 补偿 0-index 偏移（这是有效的注释）
 
-count = count + 1  # 计数器加 1（这是废话——代码已经说了）
+count = count + 1  # 计数器加 1（无效注释）
 
 # 文档字符串（docstring）：描述模块/函数/类的用途和使用方式
 def fibonacci(n: int) -> list[int]:
@@ -1069,12 +1070,12 @@ def fibonacci(n: int) -> list[int]:
     """
     if n < 0:
         raise ValueError("n must be non-negative")
-    # 实现细节……
+    # ...
 ```
 
 ### 1.2.8 获取帮助
 
-学会"自己找答案"是程序员的核心能力。
+学会"自行寻找答案"是程序员的核心素养之一。
 
 #### 内置帮助系统
 
@@ -1149,4 +1150,4 @@ dir(str)             # 列出 str 类的所有属性和方法
 - ✅ 已理解并创建了第一个虚拟环境
 - ✅ 已运行过 `hello.py`，确认一切正常
 
-如果你在这些步骤中遇到任何问题，**现在解决**——不要带着环境问题开始下一章的学习。
+如果你在这些步骤中遇到任何问题，**请立即解决**，不要遗留任何环境问题，这样才能开始下一章的学习。
