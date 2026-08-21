@@ -123,7 +123,7 @@ work = timer(work)          # 名字 work 重新绑定到 timer 的返回值
 关键推论：
 
 1. **`@deco` 是"赋值"，不是"声明"**——`work` 这个名字在装饰后指向 `wrapper`；
-2. **装饰器返回值决定替换物**——返回函数则 work 是函数；返回可调用对象（12.6）也行；**返回 `None` 则 work 变 `None`**（调用就崩）；
+2. **装饰器返回值决定替换物**——`work` 被重绑成"装饰器返回的任何东西"，不限于函数：返回可调用实例（12.6）照样能调用（12.2.4 有完整示例）；甚至返回**不可调用对象也合法**——`@property` 返回的 property 描述符就不可调用（12.3）；当然，返回 `None` 则调用就崩；
 3. 装饰器在**模块导入时**执行（定义后立即应用）——不是调用时。
 
 ```python
@@ -159,10 +159,12 @@ Python 的 `@decorator` 常被拿来和 Java 注解（Annotation）比较，但*
 @Retryable(maxAttempts = 3)
 public void fetch() { ... }
 // 运行时：Spring 等框架用反射读取注解并生成代理——"框架做装饰器"
+```
 
-// Python 装饰器：自己就是代码，不需要"框架去读"
+```python
+# Python 装饰器：自己就是代码，不需要"框架去读"
 @retry(times=3)
-def fetch(): ...          // 装饰器本身就是实现！
+def fetch(): ...          # 装饰器本身就是实现！
 ```
 
 > **设计哲学**：Java 的元编程是"**元数据 + 反射 + 框架**"三层分离（注解只声明，框架用反射解释）；Python 的元编程是"**代码即实现**"（装饰器直接执行逻辑）。Python 更直接，代价是"装饰器的副作用在导入时发生"（12.2.1 的机制）；Java 更可控，代价是"注解本身没有任何行为，全靠框架"。**Ruby 的 `method_missing`/open class** 比 Python 更激进（几乎无限制的运行时修改）；Python 在"强大"与"显式"之间取了中道。
@@ -172,6 +174,8 @@ def fetch(): ...          // 装饰器本身就是实现！
 `@timer` 用起来不能传参。`@retry(times=3)` 这种**带参数的装饰器**需要两层结构：
 
 ```python
+import time
+
 def retry(times=3, delay=0.1):
     """装饰器工厂：外层接收参数，内层接收函数。"""
     def decorator(func):              # 真正的装饰器
@@ -179,11 +183,10 @@ def retry(times=3, delay=0.1):
             for attempt in range(times):
                 try:
                     return func(*args, **kwargs)
-                except Exception as e:
+                except Exception:
                     if attempt == times - 1:
                         raise           # 最后一次：抛出原始异常
-                    time.sleep(delay)
-            return None
+                    time.sleep(delay)   # 否则等待后重试
         return wrapper
     return decorator
 
@@ -200,13 +203,13 @@ def fetch(): ...
 |------|------|---------|
 | `@deco` | 1 层（deco 收函数） | 导入时：`deco(f)` |
 | `@deco(args)` | 2 层（外层收参数 → 内层收函数） | 导入时：`deco(args)(f)` |
-| `@deco(a)(b)` | 可叠加 | 链式应用 |
+| `@deco(a)(b)` | 任意表达式依次调用 | 导入时：`f = deco(a)(b)(f)` |
 
 > **实战建议**：带参数装饰器的惯用命名——外层函数名即"装饰器名"（`retry`），内层常用 `decorator`/`wrapper` 的约定命名，可读性最佳。注意：`@retry`（不带括号）与 `@retry()`（带空括号）**不是一回事**——前者是"retry 直接收函数"（会因参数错位出错），后者是"先调用工厂"。设计装饰器时要决定支持哪种形态（多数支持 `@retry()`）。
 
 ### 12.2.3 functools.wraps 与元信息
 
-第 13 章 13.4.4 提过 `wraps` 是"写装饰器必加"，现在看它为什么必要：
+第 13 章 13.4.4 会把 `wraps` 收入 functools 工具箱并标注"写装饰器必加"，这里先看它为什么必要：
 
 ```python
 # 不 wraps 的后果
@@ -247,7 +250,7 @@ def timer(func):
 
 **`__wrapped__` 的价值**：`inspect.signature(work)` 能**穿透装饰器**拿到原始签名（`inspect.signature` 会沿 `__wrapped__` 链解析）——这对文档生成、类型检查、框架（如 Flask 路由）至关重要。
 
-> **🔑 机制洞察**：`wraps` 本质是 `update_wrapper(wrapper, func)`——把 `func` 的 `__module__`/`__name__`/`__qualname__`/`__doc__`/`__dict__` 拷贝到 `wrapper`，再设 `__wrapped__ = func`。它解决的是"**装饰器让函数丢失身份**"——没有它，调试器、`help()`、pickle、测试（第 14 章的断言信息）都会引用错误的函数名。
+> **🔑 机制洞察**：`wraps` 本质是 `update_wrapper(wrapper, func)`——把 `func` 的 `__module__`/`__name__`/`__qualname__`/`__annotations__`/`__doc__`/`__dict__` 拷贝到 `wrapper`，再设 `__wrapped__ = func`。它解决的是"**装饰器让函数丢失身份**"——没有它，调试器、`help()`、pickle、测试（第 14 章的断言信息）都会引用错误的函数名。
 
 ### 12.2.4 类装饰器
 
@@ -277,7 +280,51 @@ Point({'x': 1, 'y': 2})
 | 类装饰器 | 类创建**之后** | 修改类属性、追加方法、替换类 |
 | 元类 | 类创建**过程中** | 拦截/修改命名空间、控制继承、改变创建流程 |
 
-> **实战建议**：**能类装饰器就不元类**——类装饰器更简单、更易读（`@dataclass` 就是"类装饰器 + 内省注解"实现的，没有用元类！）。标准库 `dataclasses`、`enum`（3.11+ 部分）、`functools.total_ordering` 都是类装饰器方案。元类只在"需要接管类创建过程"时才上（12.5.5）。
+> **实战建议**：**能类装饰器就不元类**——类装饰器更简单、更易读（`@dataclass` 就是"类装饰器 + 内省注解"实现的，没有用元类！）。标准库 `dataclasses`、`functools.total_ordering`、`enum` 的 `@unique`/`@verify` 都是类装饰器方案。元类只在"需要接管类创建过程"时才上（12.5.5）。
+
+#### 别混淆：装饰类 vs 用类实现的装饰器
+
+上面讲的是"**装饰类**"的装饰器（收类、返类）。另一个正交概念是"**用类实现装饰器**"——它利用的正是 12.2.1 推论 2："替换物只要是可调用对象即可"，而实现了 `__call__` 的实例正是可调用对象（12.6）。陷阱清单里"每实例状态用可调用对象"（12.2.6）指的就是这种形态：
+
+```python
+import time
+from functools import wraps
+
+class Timed:
+    """用类实现的计时装饰器：__init__ 收函数，__call__ 代为调用。"""
+    def __init__(self, func):
+        wraps(func)(self)          # wraps 也能用在实例上：元信息复制到 self
+        self.func = func
+        self.calls = 0             # 状态在实例里：显式、可直接读写
+    def __call__(self, *args, **kwargs):
+        self.calls += 1
+        t0 = time.perf_counter()
+        result = self.func(*args, **kwargs)
+        print(f"{self.func.__name__} #{self.calls} took {time.perf_counter()-t0:.4f}s")
+        return result
+
+@Timed                            # ≡ slow = Timed(slow)：slow 现在是 Timed 实例！
+def slow():
+    time.sleep(0.01)
+
+>>> slow()                        # 调用实例 → 触发 __call__
+slow #1 took 0.0104s
+>>> slow.calls                    # 状态可直接读取——闭包版做不到
+1
+>>> isinstance(slow, Timed)       # 可类型判断——闭包版同样做不到
+True
+```
+
+两种形态的取舍：
+
+| | 函数式 wrapper | 类实现（`__call__`） |
+|---|---|---|
+| 样板代码 | 少（一层闭包） | 多（`__init__` + `__call__`） |
+| 携带状态 | 闭包变量（隐式、外部读不到） | 实例属性（显式、可读写、可重置） |
+| 类型判断 | 不便 | `isinstance(x, Timed)` |
+| 适用 | 无状态/轻状态的横切逻辑 | 需要管理状态或配置的装饰器 |
+
+> **🔑 机制闭环**：标准库里 `property` 本身就是"类当装饰器用"的活例子——且它返回的实例**不可调用**（是描述符，12.3.3），证明装饰器的返回值连 Callable 都不必是。至此三种形态凑齐完整图景：**函数返回函数 → 类返回可调用实例 → 类返回描述符**。
 
 ### 12.2.5 装饰器栈与顺序
 
@@ -307,11 +354,14 @@ def b(func):
 def f(): print("f")
 
 f()
-# 应用顺序（定义时）：b decorating f → a decorating b(f)
+# 应用顺序（定义时）：先打印 b decorating f，再打印 a decorating wrapper
+#                    （a 拿到的是 b 的 wrapper，所以 func.__name__ 是 "wrapper"）
 # 调用顺序（运行时）：a before → b before → f → b after → a after
 ```
 
-> **⚠️ 陷阱**：装饰器顺序在"依赖行为"的装饰器上很重要——如 `@app.route`（Flask 路由注册）与 `@login_required`（权限）：**注册装饰器通常放最外层**（先被应用，先登记）。经典例子：`@property` 与 `@classmethod` 不能直接叠加（两者都是描述符，顺序不同结果不同）——`@property` 必须在最外层（`@classmethod` 返回绑定方法，`property` 要包它）。
+> **⚠️ 陷阱**：装饰器顺序在"依赖行为"的装饰器上很重要——如 `@app.route`（Flask 路由注册）与 `@login_required`（权限）：**注册装饰器通常放最外层**（先被应用，先登记）。再看缓存与日志的顺序：`@lru_cache` 在外、日志在内 → 命中缓存时**不打印日志**；反过来则**每次调用都打印**——哪个正确取决于语义，放错就是 bug。
+>
+> **版本注意**：3.9–3.12 曾支持 `@classmethod` 包裹 `@property` 实现"类级属性"（3.11 起文档标记弃用，3.13 移除）；如今**两种叠加顺序都无法实现类级属性**——`@property` 在外会 `TypeError: 'classmethod' object is not callable`，`@classmethod` 在外则 `property` 被静默忽略。
 
 ### 12.2.6 实战模式大全（🔑 实战模式）
 
@@ -355,12 +405,12 @@ def memoize(func):
 ```
 
 ```python
-# 标准库 lru_cache 的装饰器形态回顾（13.4.2）：
+# 标准库 lru_cache 的装饰器形态（13.4.2 详述）：
 # @lru_cache(maxsize=128)  ← 装饰器工厂
-# 内部：_lru_cache_wrapper（C 实现）+ OrderedDict LRU（13.2.2 提过 move_to_end）
+# 内部：_lru_cache_wrapper（C 实现）+ OrderedDict LRU（move_to_end 见 13.2.2）
 ```
 
-> **实战建议**：装饰器模式的选择表——**无参数注册**用 `@register`（单层）；**带参数**用工厂（双层）；**需要状态**用闭包字典或可调用对象（12.6）；**需要保留签名**必加 `@wraps`。装饰器是"横切关注点"（日志/权限/缓存/重试）的标准载体——它们不该散落在业务函数内部，装饰器把它们提升为**可组合的声明**。
+> **实战建议**：装饰器模式的选择表——**无参数注册**用 `@register`（单层）；**带参数**用工厂（双层）；**需要状态**用闭包字典或可调用对象（12.6）；**需要保留签名**必加 `@wraps`。本节示例为聚焦模式本身省略了 `@wraps`，实际项目中必加。装饰器是"横切关注点"（日志/权限/缓存/重试）的标准载体——它们不该散落在业务函数内部，装饰器把它们提升为**可组合的声明**。
 
 #### 装饰器陷阱清单
 
@@ -1131,7 +1181,7 @@ def make_counter():
     return counter
 ```
 
-> **实战建议**：**带配置的可调用**（`Processor(mode="fast")` 后 `p(data)`）是可调用实例的最佳场景——配置在 `__init__`、行为在 `__call__`。与"闭包携带配置"相比，可调用实例可 `isinstance` 判断、可序列化部分状态、可继承——工程上更规范。`functools.partial`（13.4.1）就是"可调用对象"的标准库案例。
+> **实战建议**：**带配置的可调用**（`Processor(mode="fast")` 后 `p(data)`）是可调用实例的最佳场景——配置在 `__init__`、行为在 `__call__`。与"闭包携带配置"相比，可调用实例可 `isinstance` 判断、可序列化部分状态、可继承——工程上更规范。用它实现装饰器的完整形态见 12.2.4；`functools.partial`（13.4.1）则是"可调用对象"的标准库案例。
 
 ### 12.6.3 functools.partial 的实现视角
 
