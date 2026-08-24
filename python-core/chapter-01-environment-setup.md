@@ -873,7 +873,7 @@ jupyter lab      # 在浏览器中打开 JupyterLab
 
 #### IDLE（Python 内置）
 
-IDLE 是 Python 自带的简易 IDE——不需要任何安装，打开 `python -m idlelib` 或从开始菜单启动。它适合**最简单的练习**，但不适合真实项目开发。
+IDLE 是 Python 自带的简易 IDE，不需要任何安装，打开 `python -m idlelib` 或从开始菜单启动。它适合**最简单的练习**，但不适合真实项目开发。
 
 ### 1.2.6 第一个 Python 程序
 

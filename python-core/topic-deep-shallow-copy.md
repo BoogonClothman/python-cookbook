@@ -1,4 +1,4 @@
-# 专题：Python 深浅拷贝——从引用语义到 CPython 底层
+# 专题：Python 深浅拷贝，从引用语义到 CPython 底层
 
 > **核心问题**：`a = b`、`a = b[:]`、`a = b.copy()`、`a = copy.copy(b)`、`a = copy.deepcopy(b)` 到底有什么区别？为什么 `[[]] * 3` 是经典的 Python 新手杀手？为什么函数默认参数用 `[]` 会出 bug？这些问题指向同一个根源——Python 的对象模型。
 

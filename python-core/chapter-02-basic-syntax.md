@@ -1,37 +1,38 @@
 # 第2章 Python 基础语法
 
-> **学习目标**：建立对 Python 语法规则的完整心智模型——不是背语法，而是理解每条规则为何如此设计、它在你日常编码中如何影响你、以及踩坑后如何最快爬出来。
+> **学习目标**：建立对 Python 语法规则的完整心智模型，理解每条语法规则的设计意图。
 
 ---
 
 ## 2.1 语句与表达式
 
-这是最基础的区分，但很多教程一笔带过。"理解语句和表达式的区别"直接决定了你能否理解为什么某些代码合法、另一些不合法。
+这是最基本的区别。很多教程关于这个问题常常一笔带过。但是"理解语句和表达式的区别"将直接决定 **能否理解为什么某些代码形式合法、另一些不合法**。
 
 ### 2.1.1 核心区分
 
-| | 表达式 Expression | 语句 Statement |
+| | 表达式 （Expression） | 语句 （Statement） |
 |------|------|------|
-| **定义** | 可以**求值**（evaluate）为一个对象的代码片段 | 执行一个**动作**（action）的代码单元 |
+| **定义** | 可以**求值**（evaluate）为一个对象的代码片段，可作为值使用 | 执行一个**动作**（action）的代码单元，不可作为值使用 |
 | **有无返回值** | 有（一定产生一个对象） | 无（不产生值） |
 | **能否嵌套** | 可以嵌套在其他表达式中 | 语句内部可以包含表达式，但语句不能嵌套在表达式中 |
 | **典型例子** | `42`, `x + 1`, `len(lst)`, `x if cond else y` | `if`, `for`, `while`, `def`, `class`, `import`, `pass` |
 
 ```python
 # 表达式：返回一个对象
->>> 2 + 3          # → 5（int 对象）
->>> "hello".upper()  # → "HELLO"（str 对象）
->>> x = 5             # 赋值语句——但 x = 5 本身不返回值！
+>>> 2 + 3             # → 5（int 对象）
+>>> "hello".upper()   # → "HELLO"（str 对象）
+# 语句：执行一个动作
+>>> x = 5             # 赋值语句，但 x = 5 本身不返回值
 ```
 
-**Python 与 C/Java 的关键差异**：在 C 中，赋值 `x = 5` 是一个表达式（返回值 5），可以写 `while (x = getchar())`。Python 刻意不允许这样做——赋值是语句，不能出现在需要表达式的位置。这是一个**故意为之的安全设计**，防止 `==` 和 `=` 混淆导致的经典 bug。
+**Python 与 C/Java 的关键差异**：在 C 中，赋值 `x = 5` 是一个表达式（返回值 5），可以写 `while (x = getchar())`。而 Python 禁止这种做法，因为赋值是语句，不能出现在需要表达式的位置。这是**故意为之的安全设计**，防止 `==` 和 `=` 混淆导致出错。
 
 ```python
-# Python 禁止（语法错误）
+# 禁止（语法错误）
 >>> while line = file.readline():   # SyntaxError
 ...     process(line)
 
-# 必须这样写——Python 3.8+ 可以用海象运算符破例：
+# 必须这样写（Python 3.8+ 可以用海象运算符破例）
 >>> while line := file.readline():  # := 是赋值表达式
 ...     process(line)
 ```
@@ -57,35 +58,35 @@ x              # 合法但不做任何事
 
 ### 2.1.3 `pass`：空语句
 
-`pass` 是 Python 的**空操作语句**——语法上需要一个语句但你暂时不想写任何代码：
+`pass` 是 Python 的**空操作语句**。空语句的意义是，语法上需要一个语句来占位，但你暂时不想写任何代码或无需编写任何代码：
 
 ```python
-# 占位——稍后实现
+# 占位，稍后实现
 def not_implemented_yet():
     pass
 
 class EmptyBase:
     pass
 
-# 在 except 中吞掉异常（谨慎使用！）
+# 在 except 中吞掉异常（务必谨慎使用）
 try:
     risky_operation()
 except ValueError:
     pass       # 显式决定忽略这个异常
 ```
 
-> **风格建议**：用 `...`（Ellipsis 字面量）替代 `pass` 也是合法的，且在存根文件中更常见。但在普通代码中，`pass` 是惯用法。
+> **风格建议**：用 `...`（Ellipsis 省略号字面量）替代 `pass` 也是合法的，且在存根文件中更常见。但在普通代码中，`pass` 是惯用法。
 
 ---
 
 ## 2.2 缩进与代码块
 
-Python 用缩进定义代码块——这不是语法糖，而是语法的**核心组成部分**。缩进错误是**语法错误**，不是风格问题。
+Python 用缩进定义代码块，这是语法的**核心组成部分**。缩进错误是绝对的**语法错误**，不是编码风格问题。
 
 ### 2.2.1 缩进规则
 
 ```python
-# 冒号(:)后下一行缩进，开启一个新代码块
+# 冒号(:)后下一行缩进，开启下一级的新代码块
 if condition:          # ← 冒号说"下面是一个代码块"
     do_first()         # ← 缩进 4 空格，这条语句属于 if
     do_second()        # ← 同缩进，也属于 if
@@ -94,13 +95,11 @@ do_after()             # ← 回到原缩进层级，不属于 if
 
 **核心规则**：
 1. **冒号 `:` 开启新块**——`if`、`else`、`elif`、`for`、`while`、`def`、`class`、`try`/`except`/`finally`、`with`、`match`/`case`
-2. **块的第一条语句确定该块的基准缩进量**
+2. **块的第一条语句确定该块的标准缩进量**
 3. **同块内的所有语句缩进量必须严格一致**
 4. **块结束后回退到上一级缩进**
 
 ### 2.2.2 空格 vs 制表符
-
-这是一个值得花 3 分钟彻底理解的问题——它制造的 bug 可以浪费你 3 个小时。
 
 ```python
 # 这个文件看起来没问题，但：
@@ -109,7 +108,7 @@ def greet():
 	print("World")      # 这行用 Tab 缩进 ← 看起来很对齐
 ```
 
-Python 3 **禁止混用 Tab 和空格**——会直接抛出 `TabError: inconsistent use of tabs and spaces in indentation`。这不是可配置的 linting 选项，是硬语法规则。
+Python 3 **禁止混用 Tab 和空格**，否则抛出异常 `TabError: inconsistent use of tabs and spaces in indentation`。
 
 **PEP 8 裁决**：**只用空格，每级 4 个空格**。
 
@@ -129,7 +128,7 @@ def func():
 		    do_other()
 ```
 
-> **实战配置**：在 VS Code 中设置 `"editor.renderWhitespace": "all"`，让 Tab 和空格可视化显示为 `→` 和 `·`。永远不要在肉眼看不到缩进字符的情况下调试缩进问题。
+> **实战配置**：在 VS Code 中设置 `"editor.renderWhitespace": "all"`，让 Tab 和空格可视化显示为 `→` 和 `·`。永远不要在肉眼看不到缩进字符的情况下调试缩进问题。现代化的IDE通常选择将Tab转译为一个标准缩进量，但是Vi、Vim等旧编辑器仍然会严格区分。
 
 ### 2.2.3 隐式行连接
 
@@ -173,17 +172,17 @@ if (condition_one
 当隐式连接不适用（没有括弧可用），用 `\` 显式续行：
 
 ```python
-# 显式续行——不得已时使用
+# 显式续行
 long_string = "this is a very long string that " \
               "spans multiple lines for readability"
 
-# 多个 with 语句——\ 续行
+# 多个 with 语句，\ 续行
 with open("input.txt") as infile, \
      open("output.txt", "w") as outfile:
     outfile.write(infile.read())
 ```
 
-**反斜杠续行的陷阱**：`\` 后必须是换行符——后面不能有空格或注释：
+**反斜杠续行的陷阱**：`\` 后必须是换行符，也就是后面不能有空格或注释：
 
 ```python
 # ❌ 反斜杠后有空格——SyntaxError
@@ -199,13 +198,13 @@ x = 1 + \  # this is a comment
 
 ### 2.2.5 一行多语句：分号 `;`
 
-Python 允许用分号在一行写多个语句，但**强烈不建议**：
+Python 允许用分号在一行写多个语句，但**不建议**：
 
 ```python
 # 合法但不可读
 a = 1; b = 2; print(a + b)
 
-# ✅ 只有一种情况分号可以接受：极短的两句紧密相关操作
+# 只有一种情况分号可以接受：极短的两句紧密相关操作，可视作原子操作时，可以使用分号来增强可读性。
 import sys; sys.setrecursionlimit(10000)
 ```
 
@@ -220,9 +219,9 @@ import sys; sys.setrecursionlimit(10000)
 
 x = 42  # 行内注释——说明"为什么"，而非"做什么"
 
-"""这不是注释——这是一个字符串字面量。
+"""这不是注释，这是一个纯粹的字符串字面量。
 如果它不在赋值语句或表达式里，Python 会生成它然后丢弃。
-这就是为什么它可以被用作多行注释——但严格来说它不是注释。
+这就是为什么它可以被当作多行注释。但严格来说它不是注释。
 """
 ```
 
@@ -289,7 +288,7 @@ def fibonacci(n: int) -> list[int]:
     return result
 ```
 
-**文档字符串风格**：Google 风格（上例）、NumPy 风格、Sphinx reStructuredText 风格均可。在一个项目中保持一致即可。Google 风格因可读性最高，在科学计算之外的主流 Python 项目中增长最快。
+**文档字符串风格**：Google 风格（上例）、NumPy 风格、Sphinx reStructuredText 风格均可，但建议在一个项目中保持一致。Google 风格因可读性最高，在科学计算之外的主流 Python 项目中增长最快。如果你进行软件方向的开发，那么建议你使用Google风格；如果你进行数据科学计算，建议你使用NumPy风格。
 
 ---
 
@@ -297,7 +296,7 @@ def fibonacci(n: int) -> list[int]:
 
 ### 2.4.1 标识符规则
 
-Python 3 的标识符支持 Unicode——这意味着中文、日文、emoji 都可以作为变量名。但**可以不等于应该**。
+Python 3 的标识符支持 Unicode，这意味着中文、日文、emoji 都可以作为变量名。但**可以不等于应该**。
 
 ```python
 # 合法命名规则：
@@ -314,7 +313,7 @@ café = "coffee"     # 重音字母——合法
 # ❌ 非法
 1st_place = "gold"  # 数字开头
 class = "CS101"     # 关键字
-my-var = 42         # 连字符不是合法字符
+my-var = 42         # 连字符不是合法的标识符字符
 ```
 
 ### 2.4.2 关键字完整清单
@@ -347,7 +346,7 @@ Python 3.14 共有 **35 个关键字**（含 3 个软关键字）：
 | `__file__` | 当前模块的文件路径 |
 | `__all__` | 控制 `from module import *` 的导出列表 |
 | `__init__` | 包初始化文件或类构造函数 |
-| `__dunder__` | 双下划线前后缀——Python 的"魔术方法"，由解释器调用，**不应自己发明新的** |
+| `__dunder__` | 双下划线前后缀。Python 的"魔术方法"，由解释器调用。 |
 
 ### 2.4.4 命名约定全景
 
@@ -370,7 +369,7 @@ PI = 3.14159
 # 内部/私有（约定，非强制）：_leading_underscore
 _internal_cache = {}
 def _helper_function():
-    """外部调用者请不要依赖此函数——它可能随时变化。"""
+    """外部调用者请不要依赖此函数，它可能随时变化。"""
     pass
 
 # 避免与关键字/内置名冲突：trailing_underscore_
