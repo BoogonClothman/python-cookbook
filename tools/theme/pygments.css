@@ -1,0 +1,41 @@
+/*
+ * Pygments 调色板 —— 由 ubuntu-cream 主题的 CodeMirror 配色逐项翻译而来。
+ * 映射对照（cm-* → Pygments 类）：
+ *   keyword/builtin/tag/number  #8b4513 → .k* .nb .kt .m*
+ *   atom (True/False/None)      #6b3fa0 → .kc .no
+ *   string/quote/docstring      #2a6b2a → .s* .sd
+ *   comment                     #8a8075 斜体 → .c*
+ *   def/header                  #2d2822 → .nf .nc
+ *   operator/variable-2         #5c554a → .o* .ow
+ *   attribute/string-2/link     #8b6914 → .nd .si
+ *   negative/error              #b03030 → .err
+ */
+
+.k, .kn, .kr, .kw, .kt,
+.nb, .bp,
+.m, .mi, .mf, .mh, .mo, .il { color: #8b4513; }
+
+.kc, .no { color: #6b3fa0; }
+
+.s, .sa, .sb, .sc, .dl, .s1, .s2, .se, .sx, .sv, .sr,
+.sd { color: #2a6b2a; }
+
+.si { color: #8b6914; }
+
+.c, .c1, .ch, .cm, .cp, .cs {
+  color: #8a8075;
+  font-style: italic;
+}
+
+.nd { color: #8b6914; }
+
+.nf, .nc { color: #2d2822; }
+
+.o, .ow { color: #5c554a; }
+
+/* pycon 词法器的 REPL 提示符与输出行 */
+.gp { color: #5c554a; }
+.go { color: #8a8075; }
+
+.err { color: #b03030; }
+.w { color: #8a8075; }

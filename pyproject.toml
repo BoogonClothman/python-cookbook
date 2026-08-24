@@ -1,0 +1,18 @@
+[project]
+name = "python-cookbook-tools"
+version = "0.1.0"
+description = "python-cookbook 教案构建工具链（PDF 生成等）"
+requires-python = ">=3.10"
+
+[dependency-groups]
+pdfgen = [
+    "markdown-it-py>=3.0",
+    "pygments>=2.17",
+    "playwright>=1.49",
+    "linkify-it-py>=2",
+    "pymupdf>=1.28.2",
+]
+
+[tool.uv]
+# pdfgen 设为默认组：uv run 无需额外旗标即可使用构建工具链
+default-groups = ["pdfgen"]

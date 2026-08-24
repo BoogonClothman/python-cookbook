@@ -1,0 +1,384 @@
+/*
+ * Ubuntu Cream — 打印版主题（自 Typora 主题移植）
+ *
+ * 原版：%APPDATA%/Typora/themes/ubuntu-cream.css
+ * 移植变更：
+ *   1. 剥离全部编辑器 UI 样式（侧栏/菜单/状态栏/focus mode/滚动条等）；
+ *   2. 打印保留奶油底色（原版 @media print 强制白底，此处按需求改为保留）；
+ *   3. 新增 callout 变体（陷阱/实战建议/机制洞察等）配色；
+ *   4. 新增断页控制：标题孤行防护、长代码块智能断页（pre.allow-break）、
+ *      表格跨页重复表头；
+ *   5. 代码高亮配色见 pygments.css（CodeMirror → Pygments 类名映射）。
+ */
+
+/* ===== Font Faces ===== */
+@font-face {
+  font-family: 'Ubuntu';
+  font-style: normal;
+  font-weight: 300;
+  src: local('Ubuntu Light'), local('Ubuntu-Light'),
+       url('./fonts/Ubuntu-L.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Ubuntu';
+  font-style: italic;
+  font-weight: 300;
+  src: local('Ubuntu Light Italic'), local('Ubuntu-LightItalic'),
+       url('./fonts/Ubuntu-LI.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Ubuntu';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Ubuntu'), local('Ubuntu-Regular'),
+       url('./fonts/Ubuntu-R.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Ubuntu';
+  font-style: italic;
+  font-weight: 400;
+  src: local('Ubuntu Italic'), local('Ubuntu-Italic'),
+       url('./fonts/Ubuntu-RI.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Ubuntu';
+  font-style: normal;
+  font-weight: 500;
+  src: local('Ubuntu Medium'), local('Ubuntu-Medium'),
+       url('./fonts/Ubuntu-M.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Ubuntu';
+  font-style: italic;
+  font-weight: 500;
+  src: local('Ubuntu Medium Italic'), local('Ubuntu-MediumItalic'),
+       url('./fonts/Ubuntu-MI.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Ubuntu';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Ubuntu Bold'), local('Ubuntu-Bold'),
+       url('./fonts/Ubuntu-B.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Ubuntu';
+  font-style: italic;
+  font-weight: 700;
+  src: local('Ubuntu Bold Italic'), local('Ubuntu-BoldItalic'),
+       url('./fonts/Ubuntu-BI.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Ubuntu Mono';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Ubuntu Mono'), local('UbuntuMono-Regular'),
+       url('./fonts/UbuntuMono-R.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Ubuntu Mono';
+  font-style: italic;
+  font-weight: 400;
+  src: local('Ubuntu Mono Italic'), local('UbuntuMono-Italic'),
+       url('./fonts/UbuntuMono-RI.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Ubuntu Mono';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Ubuntu Mono Bold'), local('UbuntuMono-Bold'),
+       url('./fonts/UbuntuMono-B.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Ubuntu Mono';
+  font-style: italic;
+  font-weight: 700;
+  src: local('Ubuntu Mono Bold Italic'), local('UbuntuMono-BoldItalic'),
+       url('./fonts/UbuntuMono-BI.ttf') format('truetype');
+}
+
+/* ===== CSS Variables ===== */
+:root {
+  --bg-color: #fefaf3;
+  --text-color: #3d3832;
+  --heading-color: #2d2822;
+  --muted-color: #6b6052;
+  --secondary-text: #5c554a;
+  --accent-color: #8b6914;
+  --gold-color: #c4a85c;
+  --border-strong: #e0d5c0;
+  --border-light: #ebe3d2;
+  --panel-bg: #f8f5ee;
+  --inline-code-bg: #f0ebe1;
+  --zebra-bg: #faf7f0;
+
+  /* callout 变体色（沿用原主题 md-alert-text-* 配色体系） */
+  --callout-warning: #b03030;
+  --callout-tip: #2a6b2a;
+  --callout-insight: #6b3fa0;
+  --callout-impact: #5c554a;
+  --callout-version: #6b6052;
+}
+
+/* ===== Base ===== */
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+}
+
+html,
+body {
+  background: var(--bg-color);
+  color: var(--text-color);
+  font-family: "Ubuntu", "SimSun", "宋体", serif;
+  line-height: 1.75;
+}
+
+#write {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 40px 30px 120px;
+}
+
+img { max-width: 100%; }
+
+/* ===== Typography ===== */
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Ubuntu", "Noto Sans SC", "SimHei", "黑体", "DengXian", "等线", sans-serif;
+  position: relative;
+  margin-top: 1.6em;
+  margin-bottom: 0.6em;
+  font-weight: 500;
+  line-height: 1.35;
+  color: var(--heading-color);
+}
+
+h1 { font-size: 2em; }
+h2 { font-size: 1.5em; }
+h3 { font-size: 1.25em; }
+h4 { font-size: 1.1em; }
+h5 { font-size: 1em; }
+h6 { font-size: 0.95em; color: var(--muted-color); }
+
+h1 {
+  border-bottom: 2px solid var(--border-strong);
+  padding-bottom: 0.35em;
+  margin-bottom: 0.8em;
+}
+
+h2 {
+  border-bottom: 1px solid var(--border-light);
+  padding-bottom: 0.25em;
+}
+
+h1 + h2 { margin-top: 0.2em; }
+h2 + h3 { margin-top: 0.6em; }
+
+p, ul, ol, dl {
+  margin: 0.75em 0;
+}
+
+li > ul, li > ol {
+  margin: 0.2em 0;
+}
+
+ul, ol { padding-left: 1.6em; }
+
+ul { list-style-type: "–  "; }
+ul ul { list-style-type: "◦  "; }
+
+a {
+  color: var(--accent-color);
+  text-decoration: none;
+  border-bottom: 1px dotted var(--gold-color);
+}
+
+strong, b { color: var(--heading-color); }
+
+em, i { color: var(--secondary-text); }
+
+hr {
+  height: 1px;
+  padding: 0;
+  margin: 2em 0;
+  background: var(--border-strong);
+  border: none;
+}
+
+/* ===== Blockquote & Callouts ===== */
+blockquote {
+  border-left: 3px solid var(--gold-color);
+  padding: 0.6em 1em;
+  margin: 1.2em 0;
+  color: var(--secondary-text);
+  background: rgba(196, 168, 92, 0.06);
+  border-radius: 0 4px 4px 0;
+}
+
+blockquote blockquote {
+  border-left-color: #d4c5a0;
+  background: transparent;
+}
+
+/* 变体：由构建脚本按 **标签** 前缀注入 class */
+blockquote.callout-warning {
+  border-left-color: var(--callout-warning);
+  background: rgba(176, 48, 48, 0.05);
+}
+blockquote.callout-tip {
+  border-left-color: var(--callout-tip);
+  background: rgba(42, 107, 42, 0.05);
+}
+blockquote.callout-insight {
+  border-left-color: var(--callout-insight);
+  background: rgba(107, 63, 160, 0.05);
+}
+blockquote.callout-impact {
+  border-left-color: var(--callout-impact);
+  background: rgba(92, 85, 74, 0.05);
+}
+blockquote.callout-version {
+  border-left-color: var(--callout-version);
+  background: rgba(107, 96, 82, 0.05);
+}
+
+blockquote.callout-warning > p:first-child > strong:first-child { color: var(--callout-warning); }
+blockquote.callout-tip     > p:first-child > strong:first-child { color: var(--callout-tip); }
+blockquote.callout-insight > p:first-child > strong:first-child { color: var(--callout-insight); }
+blockquote.callout-impact  > p:first-child > strong:first-child { color: var(--callout-impact); }
+blockquote.callout-version > p:first-child > strong:first-child { color: var(--callout-version); }
+
+/* ===== Inline Code ===== */
+code, tt {
+  font-family: "Ubuntu Mono", "Consolas", "Monaco", monospace;
+  font-size: 0.88em;
+  background: var(--inline-code-bg);
+  color: #5c3d14;
+  padding: 2px 6px;
+  border-radius: 3px;
+  border: 1px solid #e8dfcf;
+}
+
+/* ===== Code Fences ===== */
+pre {
+  font-family: "Ubuntu Mono", "Consolas", "Monaco", monospace;
+  font-size: 0.88em;
+  background: var(--panel-bg);
+  color: var(--text-color);
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  padding: 1em 1.2em;
+  margin: 1em 0;
+  line-height: 1.6;
+}
+
+/* 围栏内的 code 元素去掉行内码外观，长行折行避免打印裁切 */
+pre code {
+  display: block;
+  background: none;
+  border: none;
+  padding: 0;
+  border-radius: 0;
+  color: inherit;
+  font-size: inherit;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
+
+/* ===== Tables ===== */
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1em 0;
+  font-size: 0.95em;
+}
+
+table th {
+  font-weight: 600;
+  background: var(--inline-code-bg);
+  border-bottom: 2px solid var(--gold-color);
+}
+
+table th, table td {
+  padding: 8px 14px;
+  border: 1px solid var(--border-strong);
+  vertical-align: top;
+  line-height: 1.5;
+}
+
+table tr:nth-child(even) {
+  background: var(--zebra-bg);
+}
+
+table thead th {
+  border-bottom: 2px solid var(--gold-color);
+}
+
+/* 表格内嵌代码恢复普通观感，避免单元格被行内码边框挤爆 */
+table code {
+  padding: 1px 4px;
+  font-size: 0.9em;
+}
+
+/* ===== Task Lists ===== */
+.task-list { padding-left: 0; }
+
+.task-list-item {
+  list-style-type: none;
+  padding-left: 1.5rem;
+  position: relative;
+}
+
+.task-list-item > input {
+  margin-left: -1.5em;
+  margin-right: 0.4em;
+  -webkit-appearance: none;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid #b0a58d;
+  border-radius: 3px;
+  background: var(--bg-color);
+  vertical-align: middle;
+}
+
+.task-list-item > input[checked],
+.task-list-item > input:checked {
+  background: var(--gold-color);
+  border-color: var(--gold-color);
+}
+
+/* ===== Print ===== */
+@media print {
+  html {
+    font-size: 13px;                 /* 与 Typora 导出一致的打印密度 */
+  }
+
+  body {
+    /* 原版主题在此强制白底；本项目要求打印保留奶油底色 */
+    background: var(--bg-color);
+  }
+
+  #write {
+    max-width: 100%;
+    padding: 0;
+  }
+
+  a {
+    color: var(--accent-color);
+    border-bottom: none;             /* 打印无 hover，点线边框反而干扰 */
+  }
+
+  /* 断页控制 */
+  h1, h2, h3, h4, h5, h6 { break-after: avoid; }
+  p { orphans: 3; widows: 3; }
+  blockquote { break-inside: avoid; }
+
+  pre { break-inside: avoid; }               /* 短代码块防腰斩 */
+  pre.allow-break { break-inside: auto; }    /* 高于版心的长块由脚本标记后放行 */
+  blockquote.allow-break { break-inside: auto; }
+
+  table { break-inside: auto; }
+  thead { display: table-header-group; }     /* 跨页重复表头 */
+  tr { break-inside: avoid; }
+}
