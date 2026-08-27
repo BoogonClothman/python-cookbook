@@ -348,6 +348,15 @@ table code {
   border-color: var(--gold-color);
 }
 
+/* ===== Math（LaTeX → KaTeX，由模板脚本排版） ===== */
+.math-block {
+  margin: 0.9em 0;
+}
+
+.math-block .katex-display {
+  margin: 0;               /* 外层已给间距，避免 katex-display 默认 1em 双重留白 */
+}
+
 /* ===== Print ===== */
 @media print {
   html {
@@ -377,6 +386,7 @@ table code {
   pre { break-inside: avoid; }               /* 短代码块防腰斩 */
   pre.allow-break { break-inside: auto; }    /* 高于版心的长块由脚本标记后放行 */
   blockquote.allow-break { break-inside: auto; }
+  .math-block { break-inside: avoid; }       /* 公式块整体跨页会断成两截 */
 
   table { break-inside: auto; }
   thead { display: table-header-group; }     /* 跨页重复表头 */

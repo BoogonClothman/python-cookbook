@@ -5,10 +5,26 @@
 <title>__TITLE__</title>
 <link rel="stylesheet" href="__CSS_BASE__/ubuntu-cream-print.css">
 <link rel="stylesheet" href="__CSS_BASE__/pygments.css">
+<link rel="stylesheet" href="__KATEX_BASE__/katex.min.css">
 </head>
 <body>
 <div id="write">
 __CONTENT__
 </div>
+<!-- 数学公式：渲染规则把 $...$/$$...$$ 输出为 data-latex 占位元素，这里就地排版。
+     不用 auto-render 扫文本，避免正文散落的 $ 被误判；渲染完成后置 __katexDone
+     供构建脚本等待。throwOnError=false 时错误公式以红字原码呈现，不静默丢失。 -->
+<script defer src="__KATEX_BASE__/katex.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  document.querySelectorAll("[data-latex]").forEach(function (el) {
+    katex.render(el.getAttribute("data-latex"), el, {
+      displayMode: el.classList.contains("math-block"),
+      throwOnError: false,
+    });
+  });
+  window.__katexDone = true;
+});
+</script>
 </body>
 </html>

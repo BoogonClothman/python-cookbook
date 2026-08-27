@@ -11,6 +11,7 @@ pdfgen = [
     "playwright>=1.49",
     "linkify-it-py>=2",
     "pymupdf>=1.28.2",
+    "mdit-py-plugins>=0.4",
 ]
 
 [tool.uv]

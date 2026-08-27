@@ -17,6 +17,11 @@
     uv run python tools/build_pdf.py -v data-science 1 2  # 某卷的指定章节
 
 增量策略：对 md + 主题 css + 模板整体取 sha256，未变更且产物存在则跳过。
+
+数学公式：$...$ 与 $$...$$ 由 dollarmath 插件解析为占位元素，页面内经
+KaTeX 排版（发行包精简后随仓库放在 tools/katex/，仅保留 woff2 字体）。
+选 KaTeX 而非 Chromium 原生 MathML：后者排版质量依赖系统数学字体、复杂
+结构（矩阵等）不稳，KaTeX 输出更贴近标准论文格式（2026-08 对比定案）。
 """
 
 from __future__ import annotations
@@ -33,13 +38,16 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 OUT_DIR = REPO_ROOT / "target"
 TOOLS_DIR = Path(__file__).resolve().parent
 THEME_DIR = TOOLS_DIR / "theme"
+KATEX_DIR = TOOLS_DIR / "katex"  # 随仓库携带的 KaTeX 发行包（精简版，仅 woff2 字体）
 CACHE_PATH = OUT_DIR / ".build-cache.json"
 
 # 自动发现卷：根目录下含 *.md 的顶层子目录，排除工具/产物/依赖/CI 目录。
 VOLUME_EXCLUDE = {"tools", "target", ".venv", ".git", ".github"}
 
 from markdown_it import MarkdownIt
+from mdit_py_plugins.dollarmath import dollarmath_plugin
 from pygments import highlight as pygments_highlight
+from xml.sax.saxutils import escape
 from pygments.formatters import HtmlFormatter
 from pygments.lexers import get_lexer_by_name
 from pygments.util import ClassNotFound
@@ -139,15 +147,42 @@ def highlight_code(source: str, lang: str, attrs: str = "") -> str:
 
 def make_renderer() -> MarkdownIt:
     options = {"html": True, "highlight": highlight_code}
+    md: MarkdownIt | None = None
     for preset in ("gfm-like2", "gfm-like"):  # gfm-like2 为较新预设，逐级回退
         try:
-            return MarkdownIt(preset, options)
+            md = MarkdownIt(preset, options)
+            break
         except KeyError:
             continue
-    return MarkdownIt("commonmark", options).enable(["table", "strikethrough"])
+    if md is None:
+        md = MarkdownIt("commonmark", options).enable(["table", "strikethrough"])
+    # LaTeX 数学：$...$ 与 $$...$$ 解析为 math token，渲染规则见 _render_math
+    return md.use(dollarmath_plugin)
 
 
 RENDERER = make_renderer()
+
+
+# ---------------------------------------------------------------- 数学公式 → KaTeX
+
+def _render_math(self, tokens: list, idx: int, options: dict, env: dict) -> str:
+    """把 math_inline / math_block token 渲染为 data-latex 占位元素。
+
+    LaTeX 原文存入 data-latex 属性，由模板内嵌脚本在页面里调用 katex.render
+    就地排版（见 template.html）。不用 auto-render 扫文本：哪些片段是公式
+    由 dollarmath 在解析阶段唯一决定，正文散落的 $ 不会被误判；属性转义后
+    含 &、引号、换行的环境（aligned/cases 等）也能安全传递。
+    throwOnError=false 时错误公式以红字原码呈现，错误可见而非静默丢失。
+    """
+    tok = tokens[idx]
+    attr = escape(tok.content.strip(), {'"': "&quot;"})
+    if tok.type == "math_block":
+        return f'<div class="math-block" data-latex="{attr}"></div>\n'
+    return f'<span class="math-inline" data-latex="{attr}"></span>'
+
+
+RENDERER.add_render_rule("math_inline", _render_math)
+RENDERER.add_render_rule("math_block", _render_math)
 
 
 def extract_title(markdown_text: str) -> str:
@@ -166,8 +201,10 @@ def build_html(title: str, body_html: str) -> str:
     template = (TOOLS_DIR / "template.html").read_text(encoding="utf-8")
     # 用占位符替换而非 str.format：正文里满是花括号的代码会炸 format
     css_base = os.path.relpath(THEME_DIR, OUT_DIR).replace(os.sep, "/")
+    katex_base = os.path.relpath(KATEX_DIR, OUT_DIR).replace(os.sep, "/")
     return (
         template.replace("__CSS_BASE__", css_base)
+        .replace("__KATEX_BASE__", katex_base)
         .replace("__TITLE__", title)
         .replace("__CONTENT__", body_html)
     )
@@ -209,7 +246,9 @@ HEADER_TEMPLATE = "<span></span>"
 def print_to_pdf(page, html_path: Path, out_path: Path) -> None:
     page.goto(html_path.as_uri())
     page.emulate_media(media="print")  # 量测与打印布局保持一致，见 FIXUP_JS 注释
-    page.evaluate("document.fonts.ready")  # 等待 @font-face 加载完成再打印
+    # 等模板脚本完成 KaTeX 排版（置 __katexDone），再等 @font-face 加载完成
+    page.wait_for_function("window.__katexDone === true")
+    page.evaluate("document.fonts.ready")
     page.evaluate(FIXUP_JS)
     page.pdf(
         path=str(out_path),
@@ -337,6 +376,8 @@ def main() -> None:
 
     css_files = [THEME_DIR / "ubuntu-cream-print.css", THEME_DIR / "pygments.css"]
     template_file = TOOLS_DIR / "template.html"
+    builder_file = Path(__file__)  # 构建脚本自身入指纹：改渲染逻辑后缓存自动失效
+    katex_files = [KATEX_DIR / "katex.min.css", KATEX_DIR / "katex.min.js"]
 
     cache: dict[str, str] = {}
     if CACHE_PATH.exists():
@@ -352,7 +393,9 @@ def main() -> None:
         try:
             for vol_name, src in targets:
                 md_bytes = src.read_bytes()
-                digest = fingerprint([*css_files, template_file], md_bytes)
+                digest = fingerprint(
+                    [*css_files, template_file, builder_file, *katex_files], md_bytes
+                )
                 cache_key = f"{vol_name}/{src.stem}"
                 out_dir = OUT_DIR / vol_name
                 out_dir.mkdir(parents=True, exist_ok=True)
