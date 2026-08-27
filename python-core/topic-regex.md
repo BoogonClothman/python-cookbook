@@ -115,9 +115,9 @@ L* = {ε, a, b, aa, ab, ba, bb, aaa, aab, aba, abb, baa, bab, bba, bbb, ...}
 
 | 运算 | 符号 | 定义 | 直觉 |
 |------|------|------|------|
-| **并**（Union） | `R \| S` 或 $R \cup S$ | $\{w \mid w \in L(R) \text{ 或 } w \in L(S)\}$ | "或者" |
-| **连接**（Concatenation） | $R \cdot S$ 或 `RS` | $\{xy \mid x \in L(R), y \in L(S)\}$ | "先匹配 R，再匹配 S" |
-| **Kleene 星** | `R*` | 连接运算的闭包 | "重复零次或多次" |
+| **并**（Union） | $R \cup S$ | $\{w \mid w \in L(R) \text{ 或 } w \in L(S)\}$ | "或者" |
+| **连接**（Concatenation） | $R \cdot S$ | $\{xy \mid x \in L(R), y \in L(S)\}$ | "先匹配 R，再匹配 S" |
+| **Kleene 星** | $R^*$ | $L^* = \bigcup_{n \ge 0} L^n$（连接运算的闭包） | "重复零次或多次" |
 
 **形式化递归定义**：
 
