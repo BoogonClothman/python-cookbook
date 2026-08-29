@@ -1087,7 +1087,7 @@ Fraction(3602879701896397, 36028797018963968)
 >>> result.returncode
 0
 >>> result.stdout
-' M python-core/chapter-13-stdlib.md\n'
+' M python-core/py-13-stdlib.md\n'
 ```
 
 ```python
@@ -1173,9 +1173,9 @@ usage(total=..., used=..., free=...)
 ```python
 >>> import glob
 >>> glob.glob("python-core/*.md")          # 单层通配
-['python-core/chapter-01-environment-setup.md', ...]
+['python-core/py-01-environment-setup.md', ...]
 >>> glob.glob("**/*.md", recursive=True)   # 递归（** 需要 recursive=True）
-['README.md', 'python-core/chapter-01-...md', ...]
+['README.md', 'python-core/py-01-...md', ...]
 >>> glob.iglob("*.py")                     # 惰性版本（大目录省内存）
 ```
 
