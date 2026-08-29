@@ -3,9 +3,7 @@ name = "python-cookbook-tools"
 version = "0.1.0"
 description = "python-cookbook 教案构建工具链（PDF 生成等）"
 requires-python = ">=3.10"
-
-[dependency-groups]
-pdfgen = [
+dependencies = [
     "markdown-it-py>=3.0",
     "pygments>=2.17",
     "playwright>=1.49",
@@ -14,6 +12,15 @@ pdfgen = [
     "mdit-py-plugins>=0.4",
 ]
 
-[tool.uv]
-# pdfgen 设为默认组：uv run 无需额外旗标即可使用构建工具链
-default-groups = ["pdfgen"]
+[project.scripts]
+# 本地一方库入口：uv tool install --editable <仓库根> 后，build 命令全局可用。
+# 必须 editable 安装：tools/ 下的主题、模板、KaTeX 资源按 __file__ 相对定位。
+build = "build_pdf:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = {"" = "tools"}
+py-modules = ["build_pdf"]

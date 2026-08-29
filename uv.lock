@@ -194,10 +194,8 @@ wheels = [
 [[package]]
 name = "python-cookbook-tools"
 version = "0.1.0"
-source = { virtual = "." }
-
-[package.dev-dependencies]
-pdfgen = [
+source = { editable = "." }
+dependencies = [
     { name = "linkify-it-py" },
     { name = "markdown-it-py" },
     { name = "mdit-py-plugins" },
@@ -207,9 +205,7 @@ pdfgen = [
 ]
 
 [package.metadata]
-
-[package.metadata.requires-dev]
-pdfgen = [
+requires-dist = [
     { name = "linkify-it-py", specifier = ">=2" },
     { name = "markdown-it-py", specifier = ">=3.0" },
     { name = "mdit-py-plugins", specifier = ">=0.4" },

@@ -4,19 +4,28 @@
 下的 Markdown 教案渲染为 PDF，观感对齐 Typora 的 ubuntu-cream 主题，打印保留
 奶油底色。产物按卷分目录写入 target/<卷名>/。
 
+安装与运行：随仓库根项目（python-cookbook-tools）以 editable 方式安装为本地
+一方库，命令名为 build。editable 是前提：主题/模板/KaTeX 资源按 __file__
+相对定位，只有 editable 安装能让它们继续指向仓库内文件；
+uv run python tools/build_pdf.py 亦始终等效可用。
+
 卷由仓库根目录下的子目录自动发现：凡含 *.md 的顶层子目录（排除 tools/、target/、
-.venv/、.git 等非内容目录）即视为一卷。各卷内部章节从第 1 章重新编号，靠目录
-前缀（chapter-/ds-/ml-/dl-/llm-）消歧，符合"每卷独立可查"的定位。
+.venv/、.git 等非内容目录）即视为一卷。文件名按卷前缀约定：卷 1 统一为 py-
+（章节 py-NN-、专题 py-topic-、附录 py-appendix-a-），卷 2 起为 ds-/ml-/dl-/llm-。
 
-用法（仓库根目录执行）：
-    uv run python tools/build_pdf.py all                  # 全部卷的全部章节与专题
-    uv run python tools/build_pdf.py 1                    # 各卷的第 1 章
-    uv run python tools/build_pdf.py topic-regex          # 按文件名片段指定
-    uv run python tools/build_pdf.py 7 12 --force         # 多目标 + 忽略缓存
-    uv run python tools/build_pdf.py -v python-core all   # 仅构建某一卷
-    uv run python tools/build_pdf.py -v data-science 1 2  # 某卷的指定章节
+目标语义：命令行参数是文件名前缀（startswith 匹配，非子串），跨全部选中卷
+汇总命中；各卷前缀互不重叠，无需 -v 消歧。不带参数即全量构建。
 
-增量策略：对 md + 主题 css + 模板整体取 sha256，未变更且产物存在则跳过。
+用法：
+    build                          # 全量构建（无前缀 = 全部卷全部章节与专题）
+    build ds-                      # ds- 前缀全部文件（增量，缓存命中即跳过）
+    build py-07                    # 卷 1 第 7 章（含 oop 与 design-patterns 两份）
+    build py-topic- py-appendix-a- # 多前缀组合
+    build ds-00 -f                 # 单文件强制重建（-f 等价 --force）
+    build -v python-core           # 限定卷的全量构建
+
+增量策略：对 md、主题 css、模板、构建脚本自身、KaTeX 与字体资源整体取
+sha256，未变更且产物存在则跳过；-f/--force 忽略缓存强制重建。
 
 数学公式：$...$ 与 $$...$$ 由 dollarmath 插件解析为占位元素，页面内经
 KaTeX 排版（发行包精简后随仓库放在 tools/katex/，仅保留 woff2 字体）。
@@ -244,10 +253,20 @@ HEADER_TEMPLATE = "<span></span>"
 
 
 def print_to_pdf(page, html_path: Path, out_path: Path) -> None:
+    from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
+
     page.goto(html_path.as_uri())
     page.emulate_media(media="print")  # 量测与打印布局保持一致，见 FIXUP_JS 注释
-    # 等模板脚本完成 KaTeX 排版（置 __katexDone），再等 @font-face 加载完成
-    page.wait_for_function("window.__katexDone === true")
+    # 等模板脚本完成 KaTeX 排版（置 __katexDone），再等 @font-face 加载完成。
+    # 超时上限放宽到 120s：3000 行级章节公式密集时 30s 默认值会误伤；
+    # 超时多半意味着模板脚本没能置位 __katexDone，报错需可定位。
+    try:
+        page.wait_for_function("window.__katexDone === true", timeout=120_000)
+    except PlaywrightTimeoutError as exc:
+        raise RuntimeError(
+            "等待 KaTeX 排版完成超时（120s）：检查 tools/katex/ 资源是否完整，"
+            "以及 template.html 中 __katexDone 的置位逻辑是否被异常公式中断"
+        ) from exc
     page.evaluate("document.fonts.ready")
     page.evaluate(FIXUP_JS)
     page.pdf(
@@ -305,46 +324,41 @@ def discover_volumes() -> dict[str, Path]:
     return vols
 
 
-def chapter_number(stem: str) -> str | None:
-    """从文件名 stem 提取章号（2 位补零）：chapter-07-oop → '07'，无编号返回 None。"""
-    m = re.search(r"-(\d{1,2})(?=-|$)", stem)
-    return m.group(1).zfill(2) if m else None
+def available_prefixes(volumes: dict[str, Path]) -> list[str]:
+    """从现有文件名推导可用前缀（文件名首段 + '-'），供未命中时提示。"""
+    prefixes: set[str] = set()
+    for vol_dir in volumes.values():
+        for p in vol_dir.glob("*.md"):
+            head = p.stem.split("-", 1)[0]
+            if head:
+                prefixes.add(f"{head}-")
+    return sorted(prefixes)
 
 
 def resolve_targets(volumes: dict[str, Path], specs: list[str]) -> list[tuple[str, Path]]:
     """把命令行目标规格解析为 (卷名, 源文件路径) 列表。
 
-    规格语义：'all' 展开为选中卷内的全部 md；纯数字 N 匹配各卷的第 N 章
-    （靠文件名中的 -NN- 定位，自动适配 chapter-/ds-/ml-/dl-/llm- 等前缀，
-    同一章号下的多个文件如 oop 与 design-patterns 会一并命中）；其余按文件名
-    片段子串匹配。未命中任何文件则报错退出。
+    规格语义：'all' 展开为选中卷内的全部 md；其余参数按文件名前缀匹配
+    （startswith、大小写不敏感），在全部选中卷范围内汇总命中。各卷前缀约定
+    互不重叠，跨卷命中即精准定位，无需以 -v 消歧。同一 spec 在所有选中卷
+    均未命中时报错退出并列出可用前缀；结果按 (卷名, 文件名) 排序去重。
     """
     chosen: dict[tuple[str, str], tuple[str, Path]] = {}
-    for vol_name, vol_dir in volumes.items():
-        stems = {p.stem: p for p in sorted(vol_dir.glob("*.md"))}
-        for spec in specs:
-            if spec == "all":
-                for s, p in stems.items():
-                    chosen[(vol_name, s)] = (vol_name, p)
-                continue
-            if spec in stems:
-                # 精确文件名：唯一快速通道
-                candidates = [spec]
-            elif spec.isdigit():
-                # 数字 N：匹配该章号下的全部文件（如第 7 章含 oop 与 design-patterns）
-                want = f"{int(spec):02d}"
-                candidates = [s for s in stems if chapter_number(s) == want]
-            else:
-                lowered = spec.lower()
-                candidates = [s for s in stems if lowered in s.lower()]
-            if not candidates:
-                listing = ", ".join(sorted(stems)) or f"({vol_name}/ 下没有 md)"
-                sys.exit(
-                    f"[build_pdf] 在卷 {vol_name}/ 未找到匹配目标 {spec!r}；"
-                    f"可选：{listing}"
-                )
-            for c in candidates:
-                chosen[(vol_name, c)] = (vol_name, stems[c])
+    missed: list[str] = []
+    for spec in specs:
+        hits = 0
+        for vol_name, vol_dir in volumes.items():
+            for p in sorted(vol_dir.glob("*.md")):
+                if spec == "all" or p.stem.lower().startswith(spec.lower()):
+                    chosen[(vol_name, p.stem)] = (vol_name, p)
+                    hits += 1
+        if hits == 0:
+            missed.append(spec)
+    if missed:
+        sys.exit(
+            f"[build_pdf] 目标 {missed} 未匹配到任何文件；"
+            f"可用前缀：{'、'.join(available_prefixes(volumes))} 或 all"
+        )
     return sorted(chosen.values(), key=lambda t: (t[0], t[1].name))
 
 
@@ -352,12 +366,12 @@ def main() -> None:
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     parser = argparse.ArgumentParser(description="Markdown 教案 → ubuntu-cream PDF（多卷）")
-    parser.add_argument("targets", nargs="+", help="章节序号 / 文件名片段 / all")
+    parser.add_argument("targets", nargs="*", help="文件名前缀（如 ds-、py-07）；缺省为全量构建")
     parser.add_argument(
         "-v", "--volume", action="append", metavar="NAME",
         help="限定构建的卷（目录名，可重复 -v 多次指定）；默认全部卷",
     )
-    parser.add_argument("--force", action="store_true", help="忽略缓存强制重建")
+    parser.add_argument("-f", "--force", action="store_true", help="忽略缓存强制重建")
     args = parser.parse_args()
 
     volumes_all = discover_volumes()
@@ -371,55 +385,85 @@ def main() -> None:
     else:
         volumes = volumes_all
 
-    targets = resolve_targets(volumes, args.targets)
+    targets = resolve_targets(volumes, args.targets or ["all"])
     OUT_DIR.mkdir(exist_ok=True)
 
     css_files = [THEME_DIR / "ubuntu-cream-print.css", THEME_DIR / "pygments.css"]
     template_file = TOOLS_DIR / "template.html"
     builder_file = Path(__file__)  # 构建脚本自身入指纹：改渲染逻辑后缓存自动失效
     katex_files = [KATEX_DIR / "katex.min.css", KATEX_DIR / "katex.min.js"]
+    # 字体同样入指纹：主题/KaTeX 字体文件变更后缓存必须失效，否则旧版式留存
+    static_files = [
+        *css_files,
+        template_file,
+        builder_file,
+        *katex_files,
+        *sorted(THEME_DIR.glob("fonts/*")),
+        *sorted(KATEX_DIR.glob("fonts/*")),
+    ]
+    static_digest = fingerprint(static_files, b"")  # 与具体目标无关，整轮构建只算一次
 
     cache: dict[str, str] = {}
     if CACHE_PATH.exists():
-        cache = json.loads(CACHE_PATH.read_text(encoding="utf-8"))
+        try:
+            cache = json.loads(CACHE_PATH.read_text(encoding="utf-8"))
+            if not isinstance(cache, dict):
+                raise ValueError("顶层不是对象")
+        except (json.JSONDecodeError, ValueError):
+            print("[build_pdf] 缓存文件损坏，已忽略；本次将全量重建", file=sys.stderr)
+            cache = {}
 
     from playwright.sync_api import sync_playwright
 
-    built = skipped = 0
+    built = skipped = failed = 0
+    failures: list[str] = []
     with sync_playwright() as pw:
         browser = pw.chromium.launch()
         page = browser.new_page()
         tmp_html = OUT_DIR / ".tmp-build.html"
         try:
             for vol_name, src in targets:
-                md_bytes = src.read_bytes()
-                digest = fingerprint(
-                    [*css_files, template_file, builder_file, *katex_files], md_bytes
-                )
-                cache_key = f"{vol_name}/{src.stem}"
-                out_dir = OUT_DIR / vol_name
-                out_dir.mkdir(parents=True, exist_ok=True)
-                out_path = out_dir / f"{src.stem}.pdf"
-                if not args.force and out_path.exists() and cache.get(cache_key) == digest:
-                    print(f"  跳过（未变更）：{vol_name}/{src.name}")
-                    skipped += 1
-                    continue
-                text = md_bytes.decode("utf-8")
-                html = build_html(extract_title(text), render_markdown(text))
-                tmp_html.write_text(html, encoding="utf-8")
-                print_to_pdf(page, tmp_html, out_path)
-                paint_cream_underlay(out_path)
-                cache[cache_key] = digest
-                CACHE_PATH.write_text(
-                    json.dumps(cache, ensure_ascii=False, indent=1), encoding="utf-8"
-                )
-                print(f"  已构建：{vol_name}/{src.name} → {out_path.relative_to(REPO_ROOT)}")
-                built += 1
+                try:
+                    md_bytes = src.read_bytes()
+                    digest = hashlib.sha256(
+                        static_digest.encode("ascii") + md_bytes
+                    ).hexdigest()
+                    cache_key = f"{vol_name}/{src.stem}"
+                    out_dir = OUT_DIR / vol_name
+                    out_dir.mkdir(parents=True, exist_ok=True)
+                    out_path = out_dir / f"{src.stem}.pdf"
+                    if not args.force and out_path.exists() and cache.get(cache_key) == digest:
+                        print(f"  跳过（未变更）：{vol_name}/{src.name}")
+                        skipped += 1
+                        continue
+                    text = md_bytes.decode("utf-8")
+                    html = build_html(extract_title(text), render_markdown(text))
+                    tmp_html.write_text(html, encoding="utf-8")
+                    print_to_pdf(page, tmp_html, out_path)
+                    paint_cream_underlay(out_path)
+                    cache[cache_key] = digest
+                    CACHE_PATH.write_text(
+                        json.dumps(cache, ensure_ascii=False, indent=1), encoding="utf-8"
+                    )
+                    print(f"  已构建：{vol_name}/{src.name} → {out_path.relative_to(REPO_ROOT)}")
+                    built += 1
+                except Exception as exc:  # 单目标失败只记录，不拖垮整批
+                    failed += 1
+                    failures.append(f"{vol_name}/{src.name}: {type(exc).__name__}: {exc}")
+                    print(
+                        f"  失败：{vol_name}/{src.name}（{type(exc).__name__}: {exc}）",
+                        file=sys.stderr,
+                    )
         finally:
             browser.close()
             tmp_html.unlink(missing_ok=True)
 
-    print(f"\n完成：新建/更新 {built} 个，跳过 {skipped} 个。产物在 target/<卷名>/")
+    summary = f"\n完成：新建/更新 {built} 个，跳过 {skipped} 个"
+    if failed:
+        summary += f"，失败 {failed} 个"
+    print(summary + "。产物在 target/<卷名>/")
+    if failures:
+        sys.exit("[build_pdf] 以下目标构建失败：\n  " + "\n  ".join(failures))
 
 
 if __name__ == "__main__":
