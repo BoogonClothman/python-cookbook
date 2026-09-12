@@ -24,8 +24,12 @@ practice_env/
 *~
 
 # Project-specific (local only, do not share)
+AGENTS.md
 CLAUDE.md
 .claude/
+
+# DROPPED
+.drop/
 
 # OS
 .DS_Store
