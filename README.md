@@ -11,7 +11,7 @@
 | 卷   | 主题               | 目录                | 状态                              |
 |------|--------------------|---------------------|-----------------------------------|
 | 卷 1 | Python 语言核心    | `python-core/`      | ✅ 完成（1–15章 + 3专题 + 1附录） |
-| 卷 2 | 科学计算与数据分析 | `data-science/`     | 🚧 进行中（2 / 7）               |
+| 卷 2 | 科学计算与数据分析 | `data-science/`     | 🚧 进行中（第0–1章完成 + 2 本深水配套） |
 | 卷 3 | 机器学习           | `machine-learning/` | ⚪ 规划中                         |
 | 卷 4 | 深度学习           | `deep-learning/`    | ⚪ 规划中                         |
 | 卷 5 | 大模型与 AI 应用   | `llm/`              | ⚪ 规划中                         |
@@ -57,8 +57,10 @@
 
 | 章 | 内容 |
 |----|------|
-| [第0章 数学前置](data-science/ds-00-math-primer.md) | 记号翻译、线代形状语言（点积/矩阵乘/转置）、概率统计最小集（分布/期望方差/CLT/蒙特卡洛）、迷你数据分析实战 |
-| [第1章 NumPy 数组](data-science/ds-01-numpy.md) | **【本章节存在重大写作错误，必须在下一次编写前彻底重写】** ndarray 内存解剖（strides）、dtype 与 NEP 50、创建/变形/索引五式、视图 vs 拷贝、ufunc 与广播、聚合排序、拼接分割、`np.linalg` 最小集、性能反模式 |
+| [第0章 数学前置](data-science/ds-00-math-primer.md) | 记号与函数工具箱、可复现随机数约定、线代形状语言（点积/矩阵乘/转置/单位阵）、概率基础（频率/条件概率/PMF-PDF-CDF/期望方差/协方差/常见分布）、统计推断地基（大数定律/CLT与标准误/蒙特卡洛）、迷你数据分析实战 |
+| [第1章 NumPy 数组](data-science/ds-01-numpy.md) | 数组为什么快（量化）、数据模型（buffer/dtype/shape/strides）、dtype 与 NEP 50、创建、索引四式、视图与拷贝、广播完整规则、轴语义、ufunc（`out=`/`where=`/`at`）、聚合排序与 NaN、形状代数、线代最小集与 `einsum`、随机数 Generator、I/O、性能工程、互操作协议、调试与验证、综合实战；每节配随堂自测与"本节交付"接口说明 |
+| [第1章配套：内存深水](data-science/ds-01b-numpy-internals-memory.md) | CPython 对象开销与数组布局、缓冲区协议（PEP 3118）与 memoryview、strides 完全解析（含 `sliding_window_view` 与 `as_strided` 警戒）、缓存与规模效应、所有权与别名（`.base`/`OWNDATA`/生命周期）、分配器与惰性页、memmap、`.npy` 文件格式 |
+| [第1章配套：计算深水](data-science/ds-01c-numpy-internals-compute.md) | ufunc 循环与 CPU/SIMD 分派、`__array_ufunc__`/`__array_function__` 协议、成对求和 vs 顺序累加、排序稳定性、类型提升全表与 dtype 扩展、BLAS 后端与 `einsum` 路径、nditer/内存带宽/roofline、随机数内核、何时离开 NumPy（Numba/SciPy） |
 
 ### 待写
 
@@ -106,6 +108,7 @@
 * [x] 卷1 第5章 条件语句 & 循环语句 & 推导式
 * [x] 卷1 第6章 函数：从调用约定到函数式编程
 * [x] 卷1 第7章 面向对象编程
+* [x] 卷1 第7章配套：设计模式
 * [x] 卷1 第8章 异常处理与上下文管理器
 * [x] 卷1 第9章 文件 I/O 与序列化
 * [x] 卷1 第10章 模块与包管理
@@ -121,7 +124,9 @@
 
 **卷 2**
 * [x] 卷2 第0章 数学前置（ds-00-math-primer.md）
-* [ ] 卷2 第1章 NumPy 数组（ds-01-numpy.md）
+* [x] 卷2 第1章 NumPy 数组（ds-01-numpy.md）
+* [x] 卷2 第1章配套深水：内存与所有权（ds-01b-numpy-internals-memory.md）
+* [x] 卷2 第1章配套深水：计算与后端（ds-01c-numpy-internals-compute.md）
 * [ ] 卷2 第2章 Pandas（ds-02-pandas.md）
 * [ ] 卷2 第3章 Matplotlib（ds-03-matplotlib.md）
 * [ ] 卷2 第4章 SciPy 与统计（ds-04-scipy-stats.md）

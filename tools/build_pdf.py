@@ -81,6 +81,7 @@ CALLOUT_RULES: list[tuple[str, str]] = [
     ("理论意义", "callout-insight"),
     ("设计哲学", "callout-insight"),
     ("一条铁律", "callout-insight"),
+    ("延伸阅读", "callout-insight"),
     # tip：实操指引
     ("实战建议", "callout-tip"),
     ("记忆口诀", "callout-tip"),
