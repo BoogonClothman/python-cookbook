@@ -11,7 +11,7 @@
 | 卷   | 主题               | 目录                | 状态                              |
 |------|--------------------|---------------------|-----------------------------------|
 | 卷 1 | Python 语言核心    | `python-core/`      | ✅ 完成（1–15章 + 3专题 + 1附录） |
-| 卷 2 | 科学计算与数据分析 | `data-science/`     | 🚧 进行中（第0–1章完成 + 2 本深水配套） |
+| 卷 2 | 科学计算与数据分析 | `data-science/`     | 🚧 进行中（第0–2章完成 + 3 本深水配套） |
 | 卷 3 | 机器学习           | `machine-learning/` | ⚪ 规划中                         |
 | 卷 4 | 深度学习           | `deep-learning/`    | ⚪ 规划中                         |
 | 卷 5 | 大模型与 AI 应用   | `llm/`              | ⚪ 规划中                         |
@@ -49,7 +49,7 @@
 
 **卷 1**：✅ 全部完成（必读核心 + 进阶选修 + 3 专题 + 附录A）
 
-**卷 2**：进行中（下一步：`ds-02-pandas.md`）。**卷 3–5**：见下方规划。
+**卷 2**：进行中（下一步：`ds-03-matplotlib.md`）。**卷 3–5**：见下方规划。
 
 ## 卷 2：科学计算与数据分析
 
@@ -61,12 +61,13 @@
 | [第1章 NumPy 数组](data-science/ds-01-numpy.md) | 数组为什么快（量化）、数据模型（buffer/dtype/shape/strides）、dtype 与 NEP 50、创建、索引四式、视图与拷贝、广播完整规则、轴语义、ufunc（`out=`/`where=`/`at`）、聚合排序与 NaN、形状代数、线代最小集与 `einsum`、随机数 Generator、I/O、性能工程、互操作协议、调试与验证、综合实战；每节配随堂自测与"本节交付"接口说明 |
 | [第1章配套：内存深水](data-science/ds-01b-numpy-internals-memory.md) | CPython 对象开销与数组布局、缓冲区协议（PEP 3118）与 memoryview、strides 完全解析（含 `sliding_window_view` 与 `as_strided` 警戒）、缓存与规模效应、所有权与别名（`.base`/`OWNDATA`/生命周期）、分配器与惰性页、memmap、`.npy` 文件格式 |
 | [第1章配套：计算深水](data-science/ds-01c-numpy-internals-compute.md) | ufunc 循环与 CPU/SIMD 分派、`__array_ufunc__`/`__array_function__` 协议、成对求和 vs 顺序累加、排序稳定性、类型提升全表与 dtype 扩展、BLAS 后端与 `einsum` 路径、nditer/内存带宽/roofline、随机数内核、何时离开 NumPy（Numba/SciPy） |
+| [第2章 Pandas](data-science/ds-02-pandas.md) | DataFrame 数据模型、Index 与查找成本、loc/iloc 取写与 Copy-on-Write 契约、dtype 与两种缺失值（`NaN`/`pd.NA`）、索引对齐算术、CSV 类型往返、变形（melt/pivot/stack）、split-apply-combine 四算子、merge 行数契约与笛卡尔爆炸、时间序列（解析/时区/重采样/滚动）、清洗工作流、文本与链式写法、性能工程（向量化 1700 倍账）、调试与契约断言、八步综合实战；每节配随堂自测与"本节交付"接口说明 |
+| [第2章配套：内部实现深水](data-science/ds-02b-pandas-internals.md) | BlockManager 块与合并、CoW（PDEP-7）机制与 NumPy 视图对照、Index 引擎冷/热/批量三层成本、对齐与 hash merge 算法（含保险丝成本实测）、groupby 分桶与开关代价、时区 UTC 内核与 rolling 递推、Arrow 与两种字符串阵营、何时离开 pandas（pandas/duckdb/polars 三方实测） |
 
 ### 待写
 
 | 章 | 内容 |
 |----|------|
-| `ds-02-pandas.md` | Series/DataFrame、索引对齐、groupby/merge、缺失值、时间序列 |
 | `ds-03-matplotlib.md` | figure/axes 模型、统计图、seaborn |
 | `ds-04-scipy-stats.md` | 概率分布、假设检验、优化 |
 | `ds-appendix-a` / `ds-appendix-b` | 线代 / 概率统计急救卡（回链 ds-00） |
@@ -127,7 +128,8 @@
 * [x] 卷2 第1章 NumPy 数组（ds-01-numpy.md）
 * [x] 卷2 第1章配套深水：内存与所有权（ds-01b-numpy-internals-memory.md）
 * [x] 卷2 第1章配套深水：计算与后端（ds-01c-numpy-internals-compute.md）
-* [ ] 卷2 第2章 Pandas（ds-02-pandas.md）
+* [x] 卷2 第2章 Pandas（ds-02-pandas.md）
+* [x] 卷2 第2章配套深水：存储、对齐与分组的内部实现（ds-02b-pandas-internals.md）
 * [ ] 卷2 第3章 Matplotlib（ds-03-matplotlib.md）
 * [ ] 卷2 第4章 SciPy 与统计（ds-04-scipy-stats.md）
 * [ ] 卷2 附录A 线性代数速查
