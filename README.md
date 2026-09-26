@@ -11,7 +11,7 @@
 | 卷   | 主题               | 目录                | 状态                              |
 |------|--------------------|---------------------|-----------------------------------|
 | 卷 1 | Python 语言核心    | `python-core/`      | ✅ 完成（1–15章 + 3专题 + 1附录） |
-| 卷 2 | 科学计算与数据分析 | `data-science/`     | 🚧 进行中（第0–2章完成 + 3 本深水配套） |
+| 卷 2 | 科学计算与数据分析 | `data-science/`     | 🚧 进行中（第0–3章完成 + 3 本深水配套） |
 | 卷 3 | 机器学习           | `machine-learning/` | ⚪ 规划中                         |
 | 卷 4 | 深度学习           | `deep-learning/`    | ⚪ 规划中                         |
 | 卷 5 | 大模型与 AI 应用   | `llm/`              | ⚪ 规划中                         |
@@ -49,7 +49,7 @@
 
 **卷 1**：✅ 全部完成（必读核心 + 进阶选修 + 3 专题 + 附录A）
 
-**卷 2**：进行中（下一步：`ds-03-matplotlib.md`）。**卷 3–5**：见下方规划。
+**卷 2**：进行中（下一步：`ds-04-scipy-stats.md`）。**卷 3–5**：见下方规划。
 
 ## 卷 2：科学计算与数据分析
 
@@ -63,12 +63,13 @@
 | [第1章配套：计算深水](data-science/ds-01c-numpy-internals-compute.md) | ufunc 循环与 CPU/SIMD 分派、`__array_ufunc__`/`__array_function__` 协议、成对求和 vs 顺序累加、排序稳定性、类型提升全表与 dtype 扩展、BLAS 后端与 `einsum` 路径、nditer/内存带宽/roofline、随机数内核、何时离开 NumPy（Numba/SciPy） |
 | [第2章 Pandas](data-science/ds-02-pandas.md) | DataFrame 数据模型、Index 与查找成本、loc/iloc 取写与 Copy-on-Write 契约、dtype 与两种缺失值（`NaN`/`pd.NA`）、索引对齐算术、CSV 类型往返、变形（melt/pivot/stack）、split-apply-combine 四算子、merge 行数契约与笛卡尔爆炸、时间序列（解析/时区/重采样/滚动）、清洗工作流、文本与链式写法、性能工程（向量化 1700 倍账）、调试与契约断言、八步综合实战；每节配随堂自测与"本节交付"接口说明 |
 | [第2章配套：内部实现深水](data-science/ds-02b-pandas-internals.md) | BlockManager 块与合并、CoW（PDEP-7）机制与 NumPy 视图对照、Index 引擎冷/热/批量三层成本、对齐与 hash merge 算法（含保险丝成本实测）、groupby 分桶与开关代价、时区 UTC 内核与 rolling 递推、Arrow 与两种字符串阵营、何时离开 pandas（pandas/duckdb/polars 三方实测） |
+| [第3章 Matplotlib](data-science/ds-03-matplotlib.md) | 生态定位（命令式 vs 声明式）、pyplot 状态机 vs OO、Artist 对象树与延迟渲染、Figure/Axes 解剖与方法动物园、transform 四段链、类别轴/`c` 语义/zorder 三陷阱、统计图族容器总表、多面板与 dpi 换算（`_original_dpi` 陷阱）、色彩管线（clim 第二自由度）与 colorbar、Locator/Formatter 与图例锚定、rc 与 `.mplstyle` 模板、输出与后端（SVG 字形转 path）、pandas/seaborn 两级 API 桥接、渲染性能三本账、静默错误清单与 `check_figure` 图形契约、八步综合实战；每节配随堂自测与"本节交付"接口说明 |
 
 ### 待写
 
 | 章 | 内容 |
 |----|------|
-| `ds-03-matplotlib.md` | figure/axes 模型、统计图、seaborn |
+| `ds-03b-matplotlib-internals.md` | 第3章配套深水：draw 全流水线与 stale 机制、transform 复合数学、单位机器（日期轴/自定义类型）、后端与嵌入、色彩管线内核、渲染成本实测、动画与 blitting、何时离开 matplotlib |
 | `ds-04-scipy-stats.md` | 概率分布、假设检验、优化 |
 | `ds-appendix-a` / `ds-appendix-b` | 线代 / 概率统计急救卡（回链 ds-00） |
 
@@ -94,7 +95,7 @@
 
 ## 特点
 
-* **深入底层**：不仅讲 API，更解释实现细节（CPython 哈希表/内存布局/字节码、numpy 内存布局/广播、autograd 计算图）
+* **深入底层**：不仅讲 API，更解释实现细节（CPython 哈希表/内存布局/字节码、numpy 内存布局/广播、matplotlib 对象树/坐标变换、autograd 计算图）
 * **避开陷阱**：标注常见坑点（浮点精度、浅拷贝、可变默认参数、广播尺寸不匹配等）
 * **配套练习**：每章末尾附验证/编程练习
 * **版本跟进**：Python 核心更新至 3.14；各卷自带版本速查
@@ -130,7 +131,7 @@
 * [x] 卷2 第1章配套深水：计算与后端（ds-01c-numpy-internals-compute.md）
 * [x] 卷2 第2章 Pandas（ds-02-pandas.md）
 * [x] 卷2 第2章配套深水：存储、对齐与分组的内部实现（ds-02b-pandas-internals.md）
-* [ ] 卷2 第3章 Matplotlib（ds-03-matplotlib.md）
+* [x] 卷2 第3章 Matplotlib（ds-03-matplotlib.md）
 * [ ] 卷2 第4章 SciPy 与统计（ds-04-scipy-stats.md）
 * [ ] 卷2 附录A 线性代数速查
 * [ ] 卷2 附录B 概率与数理统计速查
