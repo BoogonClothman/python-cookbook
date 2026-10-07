@@ -11,7 +11,7 @@
 | 卷   | 主题               | 目录                | 状态                              |
 |------|--------------------|---------------------|-----------------------------------|
 | 卷 1 | Python 语言核心    | `python-core/`      | ✅ 完成（1–15章 + 3专题 + 1附录） |
-| 卷 2 | 科学计算与数据分析 | `data-science/`     | 🚧 进行中（第0–3章完成 + 4 本深水配套） |
+| 卷 2 | 科学计算与数据分析 | `data-science/`     | 🚧 进行中（第0–4章完成 + 5 本深水配套） |
 | 卷 3 | 机器学习           | `machine-learning/` | ⚪ 规划中                         |
 | 卷 4 | 深度学习           | `deep-learning/`    | ⚪ 规划中                         |
 | 卷 5 | 大模型与 AI 应用   | `llm/`              | ⚪ 规划中                         |
@@ -49,7 +49,7 @@
 
 **卷 1**：✅ 全部完成（必读核心 + 进阶选修 + 3 专题 + 附录A）
 
-**卷 2**：进行中（下一步：`ds-04-scipy-stats.md`）。**卷 3–5**：见下方规划。
+**卷 2**：进行中（下一步：第5章 `ds-05-scipy-modeling.md`）。**卷 3–5**：见下方规划。
 
 ## 卷 2：科学计算与数据分析
 
@@ -66,12 +66,17 @@
 | [第3章 Matplotlib](data-science/ds-03-matplotlib.md) | 生态定位（命令式 vs 声明式）、pyplot 状态机 vs OO、Artist 对象树与延迟渲染、Figure/Axes 解剖与方法动物园、transform 四段链、类别轴/`c` 语义/zorder 三陷阱、统计图族容器总表、多面板与 dpi 换算（`_original_dpi` 陷阱）、色彩管线（clim 第二自由度）与 colorbar、Locator/Formatter 与图例锚定、rc 与 `.mplstyle` 模板、输出与后端（SVG 字形转 path）、pandas/seaborn 两级 API 桥接、渲染性能三本账、静默错误清单与 `check_figure` 图形契约、八步综合实战；每节配随堂自测与"本节交付"接口说明 |
 | [第3章配套：渲染内核深水](data-science/ds-03b-matplotlib-internals.md) | draw 全流水线与 stale 三级回调（`savefig` 结束反而变脏）、pyplot figure manager 与 `gca` 栈、别名表与 `remove()` 解链、dataLim/viewLim/autoscale 懒状态机（读属性即兑现）、图型容器的批量构造、rcParams 校验器与样式分层；transform 四段链的括号与矩阵、换标度只换 `_child`、GridSpec/SubplotParams 解算链、constrained 求解器、`apply_aspect` 活动框、Grouper 弱引用共享；单位注册表（随模块加载增长）与 `_converter`/`units` 双槽位、自定义类型接入、字符串↔数值三种静默错误、Locator/Formatter 分界、pandas 的"临时换表"；后端注册表、`buffer_rgba` 零拷贝可写视图、格式矩阵与产物可复现性（PNG 稳 / PDF-EPS 需 `SOURCE_DATE_EPOCH` / SVG 还需 `svg.hashsalt`）、无 pyplot 嵌入；色彩管线（Normalize 家族、`_lut` 的 N+3 行、colorbar 是"拥有一根轴"的对象）；渲染成本实测三杠杆（简化 37×、分块 2.2×、对象合并 6× 产物）与光栅化救护（85×）；`animated` 的两副面孔与 blitting（49×）；离开 matplotlib 的量化边界 |
 
+| [第4章 SciPy 与统计推断](data-science/ds-04-scipy-stats.md) | scipy 定位与推断四步骨架；随机变量对象（`rvs/pdf/cdf/ppf/sf` 六方法、冻结分布、131 个分布、逆变换）；描述统计与抽样分布（ddof 三库口径、CLT 收敛实测、抗离群）；估计与区间（$t$ 区间、Wilson/exact 比例区间、bootstrap 的 percentile/basic/BCa、覆盖率实测）；假设检验全解（p 值均匀性实测、Welch vs Student 膨胀 66.6%、秩检验功效、离群点三种偏差、ANOVA 与 `tukey_hsd`/`dunnett`、FWER 63.7% 与 BH-FDR、`stats.power` 功效曲线）；相关与回归（三种相关系数、`linregress` 全字段、Theil-Sen 稳健回归、辛普森悖论）；分布拟合与正态性（四检验对照、**Lilliefors 陷阱实测**、`stats.fit`、QQ 定量诊断、Box-Cox/Yeo-Johnson、`ecdf`）；重采样三件套（三种 `permutation_type` 与误用陷阱、bootstrap、`monte_carlo_test`、分辨率与可交换性实测）；八步 A/B 流水线 + 17 条陷阱总表 + 断言化口径；每节配随堂自测与"本节交付"接口说明 |
+| [第4章配套：统计推断深水](data-science/ds-04b-scipy-internals.md) | 零分布的血统（t/F/χ² 都是正态样本的二次型，实测 KS p 值 0.37–0.93；用 z=1.96 代替 t 时 n=3 的第一类错误 18.86%）；自由度 = 二次型的秩；p 值均匀性的概率积分变换证明；非中心 t 功效解析式（nc = d√(n/2)）与 Satterthwaite 小数自由度；效应量族与换算；置换检验的精确性（穷举 2/20）与蒙特卡洛误差（p 的标准误 ∝ 1/√B）；可交换性失效的定量机制（零分布方差比 3.23 → 保守 / 0.29 → 膨胀）；BCa 三步手算完全复现 scipy；bootstrap 三个失效场景（重尾 88.1%、极值 0.0%、依赖 45.2%）；FWER 精确值与相关性影响（ρ=0.9 时校正当到 1.35%）；BH 在 FDR 4% 下真阳性率是 Bonferroni 的两倍；样本量三档公式精度（392/63/25 对精确 394/64/26）；事后功效是 p 值的复读机；MLE 的对数似然必要性、似然脊线（相关 −0.93）、**`stats.fit` 不给 bounds 的静默失败**、渐近 SE 低估 25–33%、拟合优度的参数自助校准 |
+
 ### 待写
 
 | 章 | 内容 |
 |----|------|
-| `ds-04-scipy-stats.md` | 概率分布、假设检验、优化 |
+| `ds-05-scipy-modeling.md` | 第5章 SciPy 数值方法与建模：线性方程组与病态诊断、线性/整数/非线性优化、曲线拟合、插值与数据补全、积分与微分方程、随机模拟与敏感性、图网络与聚类、信号与频域、建模综合实战 |
+| `ds-05b-scipy-numerics-internals.md` | 第5章配套深水：LU/QR/SVD 与条件数几何、BLAS/LAPACK 分派、HiGHS 单纯形与内点、KKT、ODE 稳定域与刚性、稀疏存储与迭代法、QMC 序列构造、FFT |
 | `ds-appendix-a` / `ds-appendix-b` | 线代 / 概率统计急救卡（回链 ds-00） |
+| `ds-appendix-c-modeling-quickref.md` | 建模竞赛速查卡：按"问题类型 → 函数 → 最短可复制代码"（LP/MILP/指派/最短路/最大流/聚类/滤波/FFT/拟合/ODE） |
 
 ## 卷 3–5：规划中
 
@@ -86,7 +91,8 @@
 | 目标             | 路径                                        |
 |------------------|---------------------------------------------|
 | 纯 Python 开发者 | 卷 1 必读核心 → 进阶选修                    |
-| 数据分析师       | 卷 1 必读核心 → 卷 2                        |
+| 数据分析师       | 卷 1 必读核心 → 卷 2（到第4章收口）         |
+| 数学建模 / 工程计算 | 卷 1 必读核心 → 卷 2 第0–2章 → 第5章（附录C 速查） |
 | 机器学习工程师   | 卷 1 必读核心 → 卷 2 → 卷 3                 |
 | 深度学习研究者   | 卷 1 必读核心 → 卷 2 → 卷 3 → 卷 4          |
 | LLM 应用开发者   | 卷 1 必读核心 → 卷 2 → 卷 5（深挖可加卷 4） |
@@ -133,9 +139,13 @@
 * [x] 卷2 第2章配套深水：存储、对齐与分组的内部实现（ds-02b-pandas-internals.md）
 * [x] 卷2 第3章 Matplotlib（ds-03-matplotlib.md）
 * [x] 卷2 第3章配套深水：draw 流水线、坐标变换与渲染内核（ds-03b-matplotlib-internals.md）
-* [ ] 卷2 第4章 SciPy 与统计（ds-04-scipy-stats.md）
+* [x] 卷2 第4章 SciPy 与统计推断（ds-04-scipy-stats.md）
+* [x] 卷2 第4章配套深水：统计推断的内核（ds-04b-scipy-internals.md）
+* [ ] 卷2 第5章 SciPy 数值方法与建模（ds-05-scipy-modeling.md）
+* [ ] 卷2 第5章配套深水：数值内核（ds-05b-scipy-numerics-internals.md）
 * [ ] 卷2 附录A 线性代数速查
 * [ ] 卷2 附录B 概率与数理统计速查
+* [ ] 卷2 附录C 建模竞赛速查卡
 
 **卷 3**
 * [ ] 卷3 机器学习
