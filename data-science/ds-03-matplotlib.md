@@ -13,7 +13,7 @@
 
 | 配套文件 | 装什么 | 状态 |
 |---------|--------|------|
-| `ds-03b-matplotlib-internals.md` | draw 全流水线与 stale 机制、transform 的复合数学、单位机器（日期轴为什么自动）、后端与嵌入、色彩管线内核、渲染成本实测、动画与 blitting、何时离开 matplotlib | 🚧 规划中（纲目见 README） |
+| `ds-03b-matplotlib-internals.md` | draw 全流水线与 stale 机制、transform 的复合数学、单位机器（日期轴为什么自动）、后端与嵌入、色彩管线内核、渲染成本实测、动画与 blitting、何时离开 matplotlib | ✅ 已完成（B1–B8） |
 
 **验证环境**：本章所有可执行输出都在 Linux 上的 Python 3.14.4 + matplotlib 3.11.2 + NumPy 2.5.3 + pandas 3.0.6 + seaborn 0.13.2 下实跑得到，后端为无头 **Agg**（3.2.1 设定后 `matplotlib.get_backend()` 返回 `'Agg'`）。计时数字随机器波动，文中只保证数量级，且已标注"本机实测"；输出图片的字节数同理。
 
@@ -574,7 +574,7 @@ array([5., 5.])
 
 路径是 `x∈[0,1]`、`y∈[1.5, 1.5]`：**x 段按 axes 分数解释（自动贯穿整幅面板），y 段按 data 解释（贴在 1.5 上）**，`BlendedGenericTransform` 把两个方向的变换拼起来。所以参考线/参考带（`axvspan`/`axhspan`）天生"贴数据、贯穿画面"，改 xlim 不影响它的视觉行为。看懂这个 blend，也就看懂了 3.5 表格里"谁在用"那一列的全部设计动机。
 
-> **机制洞察**：四段链的数学（仿射复合、`transData = transScale + transLimits` 的拆解、offset transform 的实现）在配套文件 `ds-03b` B2 展开；主章只要求达到一个标准——**看到"元素放错位置"，第一反应是检查 `transform=` 给没给对，而不是反复试坐标值**。
+> **机制洞察**：四段链的数学（仿射复合、`transData = transScale + (transLimits + transAxes)` 的拆解、offset transform 的实现）在配套文件 `ds-03b` B2 展开；主章只要求达到一个标准——**看到"元素放错位置"，第一反应是检查 `transform=` 给没给对，而不是反复试坐标值**。
 
 > **⚠️ 陷阱**：`fig.text` / `fig.legend` / `fig.suptitle` 默认用 **figure** 坐标，`ax.text` 默认用 **data** 坐标——把 `ax.text(0.5, 0.9, ...)` 当"面板高度 90%"用，数据一变就出事。统一习惯：面板内相对定位**永远显式写 `transform=ax.transAxes`**。
 
@@ -680,7 +680,7 @@ ValueError: Supply a 'c' argument or a 'color' kwarg but not both; they differ b
 
 > **⚠️ 陷阱**：`ax.plot` 在**同一 axes 连续调用**时，数据线默认 zorder 相同（2），遮挡靠"后画盖前画"——**这在调整了某条线的 zorder 之后就不成立了**。凡是"谁盖谁"有业务含义（如均线盖散点），显式写 zorder，别赌顺序。
 
-> **延伸阅读**：类别轴的单位机器与 `Categorical` 定位器、zorder 的排序实现（`sorted` 在 draw 里的确切位置），见配套文件 `ds-03b` 第 B3 节。
+> **延伸阅读**：类别轴的单位机器与 `Categorical` 定位器见配套文件 `ds-03b` 第 B3 节；zorder 的排序实现（`sorted` 在 draw 里的确切位置）见其 B1、B3 节。
 
 **随堂自测 3.6**
 
