@@ -1,20 +1,12 @@
 """python-cookbook 单章 PDF 构建器（ubuntu-cream 主题移植版）。
 
-将各卷（python-core/、data-science/、machine-learning/、deep-learning/、llm/ …）
-下的 Markdown 教案渲染为 PDF，观感对齐 Typora 的 ubuntu-cream 主题，打印保留
-奶油底色。产物按卷分目录写入 target/<卷名>/。
+将各卷（python-core/、data-science/、machine-learning/、deep-learning/、llm/ …）下的 Markdown 教案渲染为 PDF，观感对齐 Typora 的 ubuntu-cream 主题，打印保留奶油底色。产物按卷分目录写入 target/<卷名>/。
 
-安装与运行：随仓库根项目（python-cookbook-tools）以 editable 方式安装为本地
-一方库，命令名为 build。editable 是前提：主题/模板/KaTeX 资源按 __file__
-相对定位，只有 editable 安装能让它们继续指向仓库内文件；
-uv run python tools/build_pdf.py 亦始终等效可用。
+安装与运行：随仓库根项目（python-cookbook-tools）以 editable 方式安装为本地一方库，命令名为 build。editable 是前提：主题/模板/KaTeX 资源按 __file__ 相对定位，只有 editable 安装能让它们继续指向仓库内文件；uv run python tools/build_pdf.py 亦始终等效可用。
 
-卷由仓库根目录下的子目录自动发现：凡含 *.md 的顶层子目录（排除 tools/、target/、
-.venv/、.git 等非内容目录）即视为一卷。文件名按卷前缀约定：卷 1 统一为 py-
-（章节 py-NN-、专题 py-topic-、附录 py-appendix-a-），卷 2 起为 ds-/ml-/dl-/llm-。
+卷由仓库根目录下的子目录自动发现：凡含 *.md 的顶层子目录（排除 tools/、target/、.venv/、.git 等非内容目录）即视为一卷。文件名按卷前缀约定：卷 1 统一为 py-（章节 py-NN-、专题 py-topic-、附录 py-appendix-a-），卷 2 起为 ds-/ml-/dl-/llm-。
 
-目标语义：命令行参数是文件名前缀（startswith 匹配，非子串），跨全部选中卷
-汇总命中；各卷前缀互不重叠，无需 -v 消歧。不带参数即全量构建。
+目标语义：命令行参数是文件名前缀（startswith 匹配，非子串），跨全部选中卷汇总命中；各卷前缀互不重叠，无需 -v 消歧。不带参数即全量构建。
 
 用法：
     build                          # 全量构建（无前缀 = 全部卷全部章节与专题）
@@ -24,13 +16,9 @@ uv run python tools/build_pdf.py 亦始终等效可用。
     build ds-00 -f                 # 单文件强制重建（-f 等价 --force）
     build -v python-core           # 限定卷的全量构建
 
-增量策略：对 md、主题 css、模板、构建脚本自身、KaTeX 与字体资源整体取
-sha256，未变更且产物存在则跳过；-f/--force 忽略缓存强制重建。
+增量策略：对 md、主题 css、模板、构建脚本自身、KaTeX 与字体资源整体取 sha256，未变更且产物存在则跳过；-f/--force 忽略缓存强制重建。
 
-数学公式：$...$ 与 $$...$$ 由 dollarmath 插件解析为占位元素，页面内经
-KaTeX 排版（发行包精简后随仓库放在 tools/katex/，仅保留 woff2 字体）。
-选 KaTeX 而非 Chromium 原生 MathML：后者排版质量依赖系统数学字体、复杂
-结构（矩阵等）不稳，KaTeX 输出更贴近标准论文格式（2026-08 对比定案）。
+数学公式：$...$ 与 $$...$$ 由 dollarmath 插件解析为占位元素，页面内经 KaTeX 排版（发行包精简后随仓库放在 tools/katex/，仅保留 woff2 字体）。选 KaTeX 而非 Chromium 原生 MathML：后者排版质量依赖系统数学字体、复杂结构（矩阵等）不稳，KaTeX 输出更贴近标准论文格式（2026-08 对比定案）。
 """
 
 from __future__ import annotations
@@ -339,10 +327,7 @@ def available_prefixes(volumes: dict[str, Path]) -> list[str]:
 def resolve_targets(volumes: dict[str, Path], specs: list[str]) -> list[tuple[str, Path]]:
     """把命令行目标规格解析为 (卷名, 源文件路径) 列表。
 
-    规格语义：'all' 展开为选中卷内的全部 md；其余参数按文件名前缀匹配
-    （startswith、大小写不敏感），在全部选中卷范围内汇总命中。各卷前缀约定
-    互不重叠，跨卷命中即精准定位，无需以 -v 消歧。同一 spec 在所有选中卷
-    均未命中时报错退出并列出可用前缀；结果按 (卷名, 文件名) 排序去重。
+    规格语义：'all' 展开为选中卷内的全部 md；其余参数按文件名前缀匹配（startswith、大小写不敏感），在全部选中卷范围内汇总命中。各卷前缀约定互不重叠，跨卷命中即精准定位，无需以 -v 消歧。同一 spec 在所有选中卷均未命中时报错退出并列出可用前缀；结果按 (卷名, 文件名) 排序去重。
     """
     chosen: dict[tuple[str, str], tuple[str, Path]] = {}
     missed: list[str] = []
