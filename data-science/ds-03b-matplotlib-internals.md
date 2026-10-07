@@ -174,7 +174,7 @@ b'\x89PNG\r\n\x1a\n'              # PNG 头固定，说明比的是像素内容
 24169                             # 没再改 -> 字节完全一致（PNG 无时间戳）
 ```
 
-这同时给出两个事实：**PNG 是逐字节可复现的**（同一进程内两次保存完全一致），而**`fig.stale` 不能当"需要重绘"的信号**——
+这同时给出两个事实：**PNG 是逐字节可复现的**（同一进程内两次保存完全一致），而 **`fig.stale` 不能当"需要重绘"的信号**——
 
 ```python
 >>> fig.canvas.draw(); fig.stale
@@ -290,7 +290,7 @@ ValueError: list.remove(x): x not in list
 | `_viewLim` | 当前显示范围（`Bbox`） | `autoscale_view` 或 `set_xlim` | transform（`transLimits` 的源） |
 | `_stale_viewlims` | `{"x": bool, "y": bool}`，待兑现标记 | `_request_autoscale_view` | `_unstale_viewLim` |
 
-关键是**"读 viewLim 会消费懒标记"**——`viewLim` 是 property，getter 第一行就是 `self._unstale_viewLim()`：
+关键是 **"读 viewLim 会消费懒标记"**——`viewLim` 是 property，getter 第一行就是 `self._unstale_viewLim()`：
 
 ```python
 >>> fig, ax = plt.subplots(); ax.plot([0, 10], [0, 5])
@@ -613,7 +613,7 @@ array([0.125 , 0.11  , 0.775 , 0.77  ])     # 原始框不变
 
 `_shared_axes` 在 3.11 是一个普通 `dict`（键为 `"x"/"y"`），值 `Grouper` 内部是 **`WeakKeyDictionary[str, set[weakref]]`**。两个设计后果：**共享关系随轴的生命周期自动清理**（删轴不用手动退组，也就不会泄漏 figure），**共享是按"轴"而不是按"figure"**——同一张图里可以有 `sharey` 的两根轴和另一根独立轴并存。
 
-> **机制洞察**：B2 的统一图景是**"一切定位 = 若干层简单仿射的复合，且每层都可替换、可惰性求值"**。`transScale` 的 wrapper 让标度可换，`transLimits` 让数据范围可换，`transAxes` 让布局可换，`apply_aspect` 让长宽比可换，布局引擎让网格可换——你看到的"元素位置不对"，一定是这五层里**某一层的输入域给错了**。
+> **机制洞察**：B2 的统一图景是 **"一切定位 = 若干层简单仿射的复合，且每层都可替换、可惰性求值"**。`transScale` 的 wrapper 让标度可换，`transLimits` 让数据范围可换，`transAxes` 让布局可换，`apply_aspect` 让长宽比可换，布局引擎让网格可换——你看到的"元素位置不对"，一定是这五层里**某一层的输入域给错了**。
 
 > **延伸阅读**：`matplotlib/transforms.py`（`CompositeGenericTransform`、`TransformWrapper`、`BboxTransformFrom/To`、`ScaledTranslation`）；布局见 `matplotlib/_layoutgrid.py`、`matplotlib/gridspec.py`、`matplotlib/figure.py` 的 `SubplotParams`；共享轴 `Grouper` 见 `matplotlib/cbook.py`。
 
@@ -827,7 +827,7 @@ def register_pandas_matplotlib_converters(func):
 1. **转换器是装在轴上的，不是装在注册表上的**。注册表只负责"绘图那一刻怎么把数据变成 float"，画完就不管了；轴上的 `_converter` 才是持久状态（B3.2）。所以一根轴一旦建好，它的坐标语义就固定了。
 2. **`contextmanager` 临时改全局状态，是跨库桥接的标准手法**（源码里逐条 `previous = registry[type_]` / 退出时还原）。它保证 pandas 与 matplotlib 的日期处理不打架，代价是**跨库混用时语义随调用顺序变化**：同一根轴上先 `df.plot()`、再 `ax.plot(datetime)`，两者可能落在不同的转换器路径上——这正是主章 3.13"两级 API 桥接"最容易出问题的地方。
 
-seaborn 走的是另一条路（文献）：它**完全不碰单位机器**，`FacetGrid` 的做法是"先按分面变量建一张 Axes 网格（`fig.subplots` 的循环版），再把每个子集的数据投到对应 Axes"，最后交回 matplotlib 的 `Axes` 数组。**"不扩展底层协议，只组合现有对象"**正是 seaborn 可以随时被 `ax` 层接管的原因（主章 3.13）。
+seaborn 走的是另一条路（文献）：它**完全不碰单位机器**，`FacetGrid` 的做法是"先按分面变量建一张 Axes 网格（`fig.subplots` 的循环版），再把每个子集的数据投到对应 Axes"，最后交回 matplotlib 的 `Axes` 数组。 **"不扩展底层协议，只组合现有对象"** 正是 seaborn 可以随时被 `ax` 层接管的原因（主章 3.13）。
 
 > **机制洞察**：单位机器是 matplotlib 官方留出的**唯一一个"不改核心就能支持新数据类型"的扩展点**（B3.4 的 20 行接入就是证明）。它把"数据类型 → 浮点坐标 + 轴配置"做成一张可扩展的注册表，于是 `Axes` 永远只面对 float，而扩展点留给第三方。pandas 用它做"临时替换"、seaborn 干脆不用——两条路线都成立，区别只在**谁承担状态一致性**：前者把责任压在 `contextmanager` 的进出上，后者把责任压在"每张图自己重建"上。
 
@@ -1065,7 +1065,7 @@ array([[0.   , 0.   , 1.   , 1.   ],                  # under
 
 - `_lut` 是 **`(N+3, 4)`** 的 float32/float64 数组：前 `N` 行是正常颜色，**最后三行专门留给 under / over / bad**，索引分别是 `N`、`N+1`、`N+2`；
 - **默认 under/over 就是首尾色**（所以"越界不变色"是默认行为），**默认 bad 是全透明黑**（所以 `NaN` 位置默认是"洞"而不是黑块）；
-- `cmap(x)` 的语义是"按归一化值查表"：`x<0 → under`、`x>1 → over`、**掩码值 → bad**。`np.ma.masked` 走 bad 这一条，是 numpy 掩码数组与绘图库协作最优雅的一处。
+- `cmap(x)` 的语义是"按归一化值查表"：`x<0 → under`、`x>1 → over`、 **掩码值 → bad**。`np.ma.masked` 走 bad 这一条，是 numpy 掩码数组与绘图库协作最优雅的一处。
 
 ```python
 >>> r5 = cm.resampled(5); r5._init()
@@ -1134,7 +1134,7 @@ cmap._lut[(norm(data)*255).astype(int)]   5.99 ms   # 手工索引快 1.5 倍（
 2. **每次 `cmap(array)` 都要做边界判断 + 掩码处理**，比直接索引 `_lut` 慢 1.5 倍；批量预处理颜色（例如做缓存、做 LUT 索引）值得，但**不要为了这 1.5 倍在生产代码里依赖 `_lut`**（私有）；
 3. `imshow`/`scatter` 的颜色换算发生在**设置数据时或绘制时**，与 B1.8 的 `dataLim` 同理：**数据一大，颜色管线要和数据管线一起优化**（同一条"向量化"纪律，回链 ds-01 1.15）。
 
-> **机制洞察**：色彩系统的本质是**"两步分离"——`Normalize` 管数值语义，`Colormap` 管视觉映射**。所有"颜色不对"的问题都能按这两步切开：先看 `norm(v)` 是不是你要的 [0,1]（`clim`/`clip` 的锅），再看 `cmap` 的 under/over/bad 设置（视觉语义的锅）。colorbar 只是这两步的可视化代理。
+> **机制洞察**：色彩系统的本质是 **"两步分离"——`Normalize` 管数值语义，`Colormap` 管视觉映射**。所有"颜色不对"的问题都能按这两步切开：先看 `norm(v)` 是不是你要的 [0,1]（`clim`/`clip` 的锅），再看 `cmap` 的 under/over/bad 设置（视觉语义的锅）。colorbar 只是这两步的可视化代理。
 
 > **延伸阅读**：`matplotlib/colors.py`（`Normalize` 家族、`Colormap._lut`、`ColormapRegistry`）；colorbar 装配见 `matplotlib/figure.py` 的 `Figure.colorbar`/`Colorbar`；分级图实践见主章 3.9 与 [Choosing Colormaps](https://matplotlib.org/stable/users/explain/colors/colormaps.html)。
 
@@ -1307,11 +1307,11 @@ if not self.get_figure(root=True).canvas.is_saving():
 | `canvas.draw()` / `print_png()` | `False` | **跳过**（交给动画循环自己画） |
 | `anim.save(...)` | `True` | **画** |
 
-> **⚠️ 陷阱**：这正是"Notebook 里动画正常、导出的 GIF 里少了一条线"或**反过来**"静态导出多出一条本该隐藏的辅助线"的根因。`animated=True` 的语义不是"隐藏"，而是**"由我负责画"**——你必须在动画的 `update` 里手动 `draw_artist` + `blit`，否则它在交互视图里永远不会更新（B7.2）；而导出时它又被自动画进去，两条路径的行为刻意不同。
+> **⚠️ 陷阱**：这正是"Notebook 里动画正常、导出的 GIF 里少了一条线"或**反过来**"静态导出多出一条本该隐藏的辅助线"的根因。`animated=True` 的语义不是"隐藏"，而是 **"由我负责画"**——你必须在动画的 `update` 里手动 `draw_artist` + `blit`，否则它在交互视图里永远不会更新（B7.2）；而导出时它又被自动画进去，两条路径的行为刻意不同。
 
 ### B7.2 blitting：一次 49 倍的账
 
-blit 的思路是**"背景快照 + 只重绘变化的部分"**：
+blit 的思路是 **"背景快照 + 只重绘变化的部分"**：
 
 ```python
 >>> bg = fig.canvas.copy_from_bbox(fig.bbox)
@@ -1380,7 +1380,7 @@ writer 生态的分工：
 
 所以 `blit=True` 在保存路径上**语义正确地退化为全量重绘**（不会出错，只是不省时间）。想加快导出，只能从三处下手：**降 `dpi`、减帧数、减每帧的 artist 数量**（B6 的三个杠杆对每帧同样有效）。GIF 的体量则近似正比于 `dpi² × 帧数`（实测 100 dpi 124 KB → 50 dpi 68 KB）。
 
-> **机制洞察**：动画的性能模型是**"把静态图的 draw 拆到 N 帧里"**。因此它继承了 B1 的全部性质（stale、全量重绘、zorder 排序）与 B6 的全部杠杆，只额外多了一条"允许少画"的通道——blit。理解这一层，就不会再问"为什么我的动画导出还是慢"：**导出必然全量，快慢只由 `dpi × 帧数 × 每帧复杂度` 决定。**
+> **机制洞察**：动画的性能模型是 **"把静态图的 draw 拆到 N 帧里"**。因此它继承了 B1 的全部性质（stale、全量重绘、zorder 排序）与 B6 的全部杠杆，只额外多了一条"允许少画"的通道——blit。理解这一层，就不会再问"为什么我的动画导出还是慢"：**导出必然全量，快慢只由 `dpi × 帧数 × 每帧复杂度` 决定。**
 
 > **延伸阅读**：`matplotlib/animation.py`（`FuncAnimation`、`Animation.save`、各 writer 的 `isAvailable`）；blit 协议见 `matplotlib/backend_bases.py` 的 `FigureCanvasBase.blit` 与 `BufferRegion`；官方教程 [Animations with Matplotlib](https://matplotlib.org/stable/users/explain/animations/animations.html)。
 
