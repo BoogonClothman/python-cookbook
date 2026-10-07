@@ -968,7 +968,7 @@ func_kw(PyObject *self, PyObject *args, PyObject *kwargs) {
 
 | C API | 作用 |
 |-------|------|
-| `PyArg_ParseTuple` / `ParseTupleAndKeywords` | 参数解析（格式串 `"sl|d"` 等） |
+| `PyArg_ParseTuple` / `ParseTupleAndKeywords` | 参数解析（格式串 `"sl\|d"` 等） |
 | `Py_BuildValue` | 结果包装（格式串同源） |
 | `PyLong_FromLong` / `PyFloat_FromDouble` | 数值构造 |
 | `PyUnicode_FromString` | 字符串构造 |

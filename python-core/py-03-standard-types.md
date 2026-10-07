@@ -34,7 +34,7 @@ int(x, base=10)
 
 | 参数 | 类型 | 默认值 | 说明 |
 |------|------|--------|------|
-| `x` | `int | float | str | bytes | bytearray` | `0` | 要转换的数值/字符串；省略则返回 `0` |
+| `x` | `int \| float \| str \| bytes \| bytearray` | `0` | 要转换的数值/字符串；省略则返回 `0` |
 | `base` | `int` | `10` | 进制（`0` 或 2–36），仅在 `x` 为 `str`/`bytes` 时有效 |
 
 ```python
@@ -62,7 +62,7 @@ float(x=0.0)
 
 | 参数 | 类型 | 说明 |
 |------|------|------|
-| `x` | `int | float | str | bytes | bytearray` | 要转换的数值或字符串；省略返回 `0.0` |
+| `x` | `int \| float \| str \| bytes \| bytearray` | 要转换的数值或字符串；省略返回 `0.0` |
 
 ```python
 >>> float(42)               # 42.0
@@ -83,8 +83,8 @@ complex(string)
 
 | 参数 | 类型 | 默认值 | 说明 |
 |------|------|--------|------|
-| `real` | `int | float | complex | str` | `0` | 实部；如果传字符串则整体解析 |
-| `imag` | `int | float` | `0` | 虚部（不能与字符串同时使用） |
+| `real` | `int \| float \| complex \| str` | `0` | 实部；如果传字符串则整体解析 |
+| `imag` | `int \| float` | `0` | 虚部（不能与字符串同时使用） |
 
 ```python
 # 模式 1：分别指定实部和虚部
@@ -678,7 +678,7 @@ s.strip([chars])
 
 | 参数 | 类型 | 默认值 | 说明 |
 |------|------|--------|------|
-| `chars` | `str | None` | `None` | 要从两端删除的**字符集合**（非子串！）；为 `None` 时删除所有 ASCII 空白字符（空格、`\t`、`\n`、`\r` 等） |
+| `chars` | `str \| None` | `None` | 要从两端删除的**字符集合**（非子串！）；为 `None` 时删除所有 ASCII 空白字符（空格、`\t`、`\n`、`\r` 等） |
 
 ```python
 s.strip(chars)      # 去除两侧指定字符（默认空白）
@@ -707,7 +707,7 @@ s.split(sep=None, maxsplit=-1)
 
 | 参数 | 类型 | 默认值 | 说明 |
 |------|------|--------|------|
-| `sep` | `str | None` | `None` | 分隔符；为 `None` 时按任意连续空白字符拆分（且自动去除首尾空白） |
+| `sep` | `str \| None` | `None` | 分隔符；为 `None` 时按任意连续空白字符拆分（且自动去除首尾空白） |
 | `maxsplit` | `int` | `-1`（不限） | 最多拆分次数。`rsplit()` 的 `maxsplit` 同理，但从右侧计数 |
 
 ```python
