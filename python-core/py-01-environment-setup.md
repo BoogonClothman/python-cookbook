@@ -117,8 +117,11 @@ Python 的**动态 + 强类型**组合的意义：不需要声明类型（开发
 | 2023 | 3.12 | 子解释器（PEP 684）、每个解释器独立 GIL |
 | 2024 | 3.13 | **自由线程**（无 GIL 实验性）、**JIT 编译器**（实验性）、改进 REPL |
 | 2025 | 3.14 | 注解的延迟求值（PEP 649）、性能持续提升、错误信息改进 |
+| 2026 | 3.15 | Windows 官方安装入口切换为 Python Install Manager（PEP 773）；传统 .exe 安装包自 3.16 起停发 |
 
-> **Python 3.13（2024）引入两个历史性变更**：可选的自由线程模式去掉 GIL（全局解释器锁），以及基于 copy-and-patch 的 JIT 编译器。这是 Python 诞生三十余年来最激进的变化。**Python 3.14（2025）是当前最新稳定版**，带来了注解的延迟求值（PEP 649）等改进。如果你现在开始学习 Python，3.14 是推荐的起点。
+> **Python 3.13（2024）引入两个历史性变更**：可选的自由线程模式去掉 GIL（全局解释器锁），以及基于 copy-and-patch 的 JIT 编译器。这是 Python 诞生三十余年来最激进的变化。**Python 3.14（2025）** 带来了注解的延迟求值（PEP 649）等改进；**Python 3.15 于 2026 年 10 月 9 日发布，是截至 2026 年 11 月的最新稳定版**（3.14 仍处于 bugfix 维护期）。如果你现在开始学习 Python，3.15 是推荐起点，3.14 同样完全可用。
+>
+> **同期最重要的发行工程变革**：PEP 773（Python Install Manager）于 2025 年 4 月获批、同年 10 月随 3.14 发布，Windows 的安装方式在 3.14/3.15 周期内完成换代——详见 1.2.1。
 
 #### Python Software Foundation (PSF)
 
@@ -404,41 +407,75 @@ Pyodide     ← 编译到 WebAssembly
 
 ### 1.2.1 Python 的安装
 
-#### Windows
+#### Windows（2025 年起：Python Install Manager）
 
-**方法一：从 python.org 下载安装包**
+> **本节的重大背景（截至 2026 年 11 月）**：Windows 的官方安装方式已经从"下载 .exe 安装包"切换为 **Python Install Manager**（PEP 773，2025-04 获批）。传统 .exe 安装包仅存续到 Python 3.15，**自 Python 3.16（计划 2027 年 10 月）起停止发布**；旧的 `py` 启动器（PEP 397）也自 3.14 起标记 deprecated。本节按"推荐方式 → 遗留方式"组织。
 
-1. 访问 [https://www.python.org/downloads/](https://www.python.org/downloads/)，下载最新稳定版（如 Python 3.14.x）
-2. 为了保证在任何位置都可以启动Python，**运行安装程序时，务必勾选 "Add python.exe to PATH"**（默认未勾选！）
-3. 选择 "Install Now" 或 "Customize installation"
-4. 如果自定义安装，建议勾选 `pip`、`tcl/tk and IDLE`、`Python test suite`、`py launcher`
+**方法一（推荐）：Python Install Manager**
 
-**安装后验证**（在命令提示符或 PowerShell 中）：
+Python Install Manager（内部代号 PyManager）是 PSF 官方发布的 **Python 运行时管理器**——作用类似 Node.js 的 nvm、Rust 的 rustup：**它本身不带 Python**，装好之后由它负责安装、切换、升级各版本解释器（runtime）。
+
+1. 获取管理器本体（以下方式得到的完全相同，任选其一）：
+   - Microsoft Store 搜索 "Python Install Manager"（可自动更新）
+   - 命令行：`winget install 9NQ7512CXL7T`
+   - [python.org/downloads](https://www.python.org/downloads/) 下载 MSIX 包，双击安装
+   - 国内镜像（社区维护，截至 2026-11 可用）：[清华镜像](https://mirrors.tuna.tsinghua.edu.cn/python/pymanager/)、[华为云镜像](https://mirrors.huaweicloud.com/python/pymanager/)
+2. 打开终端，安装真正的 Python 运行时：
+
+```powershell
+py install 3.15           # 安装 Python 3.15 运行时
+py list                   # 查看已安装的运行时
+py list --online          # 查看可在线安装的版本
+```
+
+3. 安装后验证（在命令提示符或 PowerShell 中）：
 
 ```powershell
 python --version
-# Python 3.14.0
-pip --version
-# pip 24.x from C:\Users\...\AppData\...
+# Python 3.15.x
+python -m pip --version
+# pip 25.x 或更高版本（推荐 `python -m pip` 而非裸 `pip`，见 1.2.3）
+py help                   # 查看全部管理命令
 ```
 
-**方法二：Microsoft Store（不建议）**
+**核心命令速查**：
 
-微软商店提供受控安装，自动加入 PATH 且自动更新。但 Store 版由于WindowsApp目录的权限限制（如 `pip install --user` 行为略有不同），开发中不如官网安装灵活。
+| 命令 | 作用 |
+|------|------|
+| `py install <TAG>` | 安装指定运行时，如 `py install 3.12` |
+| `py list` / `py list --online` | 列出已安装 / 可安装的运行时 |
+| `py -V:3.12 script.py` | 用指定版本运行脚本（`-V:` 必须放在其余参数之前） |
+| `py uninstall <TAG>` | 卸载指定运行时；`py uninstall --purge` 清空全部 |
+| `py help` | 全部子命令与选项 |
 
-> **Windows 多版本管理**：如需在多个 Python 版本间切换，使用 `py` 启动器（随官网安装包自带）：
+**理解这套机制的四个要点**：
+
+- 全局命令 `python` / `py` / `pymanager` 由管理器提供，默认指向**最新稳定版**；激活虚拟环境后则自动指向环境内的解释器。
+- **首次**运行 `python` 且一个运行时都没装时，会自动安装最新稳定版；装过之后则需要显式 `py install <TAG>`（或 `py exec ...`）。
+- 首次安装运行时会提示把 `%LocalAppData%\Python\bin` 加入 PATH（可选，加入后才有 `python3.15` 这类全名别名）——**注意这与传统安装包的 "Add python.exe to PATH" 勾选框不是一回事**。
+- 运行时下载源可在 `%AppData%\Python\pymanager.json` 中用 `install.source` 配置项（或环境变量 `PYTHON_MANAGER_SOURCE_URL`、命令行 `--source`）切换到国内镜像，例如清华的 `index-windows.json`（社区验证，用前请自行确认可用性）。
+
+**方法二（遗留方式）：传统 .exe 安装包**
+
+> ⚠️ **仅 Python 3.15 及更早版本还提供 .exe 安装包**，安装程序界面上会显示 "This installer is being retired…"；**Python 3.16 起彻底停发**。只有在维护旧环境、或工具链明确要求传统安装时才需要它。
 >
-> ```powershell
-> py -3.13 --version        # 指定 3.13
-> py -3.14 --version        # 指定 3.14
-> py -0                     # 列出所有已安装版本
-> ```
+> 若使用传统方式安装，历史流程为：访问 [python.org 下载页](https://www.python.org/downloads/windows/) 获取对应版本 → 运行安装程序时**务必勾选 "Add python.exe to PATH"**（默认未勾选！）→ "Install Now" 或 "Customize installation"（自定义时可选 `pip`、`tcl/tk and IDLE`、`Python test suite` 等组件）。
+>
+> ⚠️ **新旧 `py` 命令冲突**：旧版 Python launcher 自 3.14 起 deprecated，且它的 `py` 会**遮蔽** Install Manager 提供的 `py`。两者并存导致 `py` 行为异常时，到"设置 → 应用 → 安装的应用"中卸载 "Python launcher" 即可（旧配置与新管理器不兼容，官方 troubleshooting 明确建议卸载）。
+
+**方法三：Microsoft Store**
+
+今天的 Microsoft Store 分发的就是 **Python Install Manager 本体**（与官网 MSIX 完全相同，且自动更新），安装后同样用 `py install` 安装运行时。旧式的"单版本 Store 版 Python"已从 Store 下架——它们启动慢、PATH 别名难管理等问题，也随 Install Manager 方案一并解决。
+
+**企业 / 离线部署**：不支持 MSIX 的环境（如部分自动化部署工具、Windows Server 2019）可从 python.org 下载页获取 **MSI**（无界面、需管理员权限、仅装到默认位置）；离线机先在联网机执行 `py install --download=<PATH> <TAG>...` 生成离线索引目录，再在目标机 `py install --source="<PATH>\index.json" <TAG>` 完成安装。
+
+> **平台边界**：Python Install Manager 目前**仅适用于 Windows**——PEP 773 明确将跨平台列为范围外（未来可能推进，但无时间表）。macOS 与 Linux 的官方安装方式**不变**，下文内容仍然有效。
 
 #### macOS
 
 **方法一：官网安装包**
 
-同 Windows，访问 python.org 下载 `.pkg` 安装程序，按照向导操作。
+访问 python.org 下载 `.pkg` 安装程序，按照向导操作（macOS 不涉及 Python Install Manager，见上文平台边界）。
 
 **方法二：Homebrew**
 
@@ -483,10 +520,13 @@ sudo make altinstall     # 用 altinstall 而非 install——避免覆盖系统
 
 | 工具 | 平台 | 特点 |
 |------|------|------|
+| **Python Install Manager** | Windows | 官方新一代运行时管理器（PEP 773），`py install / list / uninstall`；2025 年起取代 .exe 安装包与旧 py 启动器 |
 | **pyenv** | macOS/Linux (Windows 用 pyenv-win) | 最成熟，按目录自动切换版本 |
 | **uv** | 全平台 | Rust 写成，极快，Python 版本管理 + 包管理一体 |
 | **conda** | 全平台 | 不仅管理 Python 版本，还管理非 Python 依赖（C 库等） |
 | **asdf** | macOS/Linux | 通用多语言版本管理器（通过插件支持 Python） |
+
+> **分工速记（三层模型）**：Install Manager / pyenv / uv 管"**装哪个解释器**"（runtime）→ venv 管"**项目隔离**"（environment）→ pip / uv 管"**装哪些包**"（package）；conda 额外覆盖非 Python 的二进制依赖。它们工作在不同层面，可以组合使用，而非互相替代。
 
 **uv 入门**（2024 年新秀——由 Ruff 的作者倾力打造）：
 
@@ -610,6 +650,8 @@ Arguments: ['arg1', 'arg2']
 
 `pip`（"Pip Installs Packages"）是 Python 官方包管理工具。它从 **PyPI**（Python Package Index，`pypi.org`）下载和安装第三方包。
 
+> **注意**：Python 官方近年弃用的是 **Windows 传统 .exe 安装包**（由 Python Install Manager 取而代之，3.16 起停发），**而非 pip**。`pip`、`venv`、PyPI、`uv`、`conda` 的工作方式**完全不变**——Install Manager 控制"解释器运行时"，pip 控制"第三方包"，两者是不同层面的工具。PEP 773 还**明确拒绝**了让管理器内置依赖管理（"PyManager has no integrated support for installing dependencies, and does not propose adding any"），并建议始终用 `python -m pip` 启动 pip。
+
 #### 核心命令
 
 ```bash
@@ -715,6 +757,9 @@ Python 的 `pip install` 默认将包安装到**全局** site-packages 目录。
 ```bash
 # 创建虚拟环境
 python -m venv myenv
+
+# Windows（Python Install Manager）也可显式指定解释器版本：
+# py -V:3.15 -m venv myenv
 
 # 目录结构
 myenv/
@@ -1112,7 +1157,7 @@ dir(str)             # 列出 str 类的所有属性和方法
 
 #### 练习 1：环境验证与实践
 
-1. 在终端中运行 `python --version` 和 `pip --version`，确认 Python 和 pip 已正确安装。
+1. 在终端中运行 `python --version` 和 `python -m pip --version`，确认 Python 和 pip 已正确安装（Windows 若用 Install Manager，也可用 `py list` 查看运行时）。
 2. 创建一个虚拟环境（命名为 `practice_env`），激活它，然后在其中用 `pip install requests` 安装第三方包，最后用 `pip list` 查看已安装的包。
 3. 编写一个 `hello.py` 脚本，要求：
    - 包含 shebang 行和文档字符串
@@ -1124,8 +1169,9 @@ dir(str)             # 列出 str 类的所有属性和方法
    - `import this`，阅读 Zen of Python
    - `help(print)`，查看 print 的文档
    - `dir(str)`，列出字符串类型的所有方法
-5. 使用 `py` 启动器（Windows）或 `pyenv`（macOS/Linux）查看你系统上所有可用的 Python 版本。
-6. 将你编写的 `hello.py` 按照 PEP 8 规范检查一遍：命名是否 snake_case？缩进是否 4 空格？导入顺序是否正确？
+5. （Windows）用 `py list` 查看已安装的运行时，再用 `py install 3.12` 安装第二个版本，分别用 `py -V:3.12 --version` 与 `python --version` 验证两个版本并存；（macOS/Linux）用 `pyenv versions` 查看已安装的版本。
+6. 用 `py -V:3.12 -m venv practice_env2`（或 `python -m venv practice_env2`）再创建一个虚拟环境，确认 `python --version` 指向你刚安装的对应版本。
+7. 将你编写的 `hello.py` 按照 PEP 8 规范检查一遍：命名是否 snake_case？缩进是否 4 空格？导入顺序是否正确？
 
 ---
 
@@ -1135,10 +1181,10 @@ dir(str)             # 列出 str 类的所有属性和方法
 |------|---------|
 | 编程语言分类 | 编译 vs 解释、静态 vs 动态、强类型 vs 弱类型——Python 是动态强类型解释型语言 |
 | Python 设计哲学 | 可读性至上、一种明显的方法、自带电池、显式优于隐式 |
-| Python 历史 | Guido van Rossum 1989 开始 → Python 3 2008 → 3.14 最新稳定版 2025 |
+| Python 历史 | Guido van Rossum 1989 开始 → Python 3 2008 → 3.15 最新稳定版 2026 |
 | 解释器 | CPython 是参考实现，PyPy 更快（JIT），MicroPython 在微控制器上跑 |
-| 安装 | python.org 下载 → 勾选 Add to PATH → 验证 `python --version` |
-| 包管理 | `pip install` 从 PyPI 下载 → `pip freeze` 锁定版本 → 国内用清华/阿里镜像 |
+| 安装 | Windows：Python Install Manager → `py install <版本>` → `py list` 验证（传统 .exe 安装包 3.16 起停发）；macOS/Linux 安装方式不变 |
+| 包管理 | `pip install` 从 PyPI 下载 → `pip freeze` 锁定版本 → 国内用清华/阿里镜像；**pip/venv 方案不受安装方式换代影响** |
 | 虚拟环境 | `python -m venv env` → `source env/bin/activate` → 每个项目独立隔离 |
 | 开发工具 | VS Code + Python 扩展（首选），Jupyter（数据探索），PyCharm（大型项目） |
 | PEP 8 | 命名、缩进、空白、导入——一致性 > 个人偏好 |
