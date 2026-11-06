@@ -1,20 +1,18 @@
 # Python 教案系列
 
-面向教学的 Python 系统化教案，**即查即用、一针见血**。核心理念：**"肘后备急"**——一本随时翻查的救急手册。
-
-注重**底层原理 > 最佳实践 > 实战练习**。拒绝"见名知意"的浅层认知。
+面向教学的 Python 系统化教案，**即查即用、一针见血**。
 
 ## 系列总览
 
-本仓库以 **5 卷**组织。卷 1 是 Python 语言核心（所有方向的共同地基）；卷 2–5 面向数据科学与 AI 方向，各自独立可查、交叉引用回卷 1。
+本仓库以 **5 卷**组织。卷 1 是 Python 语言核心（所有方向的共同地基）；卷 2–5 面向数据科学与 AI 方向。
 
-| 卷   | 主题               | 目录                | 状态                              |
-|------|--------------------|---------------------|-----------------------------------|
-| 卷 1 | Python 语言核心    | `python-core/`      | ✅ 完成（1–15章 + 3专题 + 1附录） |
-| 卷 2 | 科学计算与数据分析 | `data-science/`     | ✅ 完成（第0–5章 + 6 本深水配套 + 3 附录） |
-| 卷 3 | 机器学习           | `machine-learning/` | ⚪ 规划中                         |
-| 卷 4 | 深度学习           | `deep-learning/`    | ⚪ 规划中                         |
-| 卷 5 | 大模型与 AI 应用   | `llm/`              | ⚪ 规划中                         |
+| 卷 | 主题 | 目录 | 状态 |
+|----|------|------|------|
+| 卷 1 | Python 语言核心 | `python-core/` | ✅ 完成（1–15章 + 3专题 + 1附录） |
+| 卷 2 | 科学计算与数据分析 | `data-science/` | ✅ 完成（第0–5章 + 6 本深水配套 + 3 附录） |
+| 卷 3 | 机器学习 | `machine-learning/` | ⚪ 规划中  |
+| 卷 4 | 深度学习 | `deep-learning/` | ⚪ 规划中  |
+| 卷 5 | 大模型与 AI 应用 | `llm/` | ⚪ 规划中  |
 
 ## 卷 1：Python 语言核心
 
@@ -22,34 +20,28 @@
 
 ### 已完成
 
-| 章                                                                              | 内容                                                                                                                                                                                                                                                                                                                                                                                                   |
-|---------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [第1章 环境搭建](python-core/py-01-environment-setup.md)                   | 编程语言分类、Python 发展史、设计哲学、安装部署（Windows：Python Install Manager / PEP 773）、pip/venv/uv、PEP 8                                                                                                                                                                                                                                                                                                                                    |
-| [第2章 基础语法](python-core/py-02-basic-syntax.md)                        | 语句/表达式、缩进/代码块、注释/docstring、标识符/关键字/命名、变量/对象/引用语义、赋值全解、运算符/短路/比较链、print/input/assert                                                                                                                                                                                                                                                                     |
-| [第3章 标准数据类型](python-core/py-03-standard-types.md)                  | 数字（int/float/complex/bool）、字符串、序列（list/tuple/range/bytes）、映射与集合（dict/set/frozenset）                                                                                                                                                                                                                                                                                               |
-| [第4章 运算符](python-core/py-04-operators.md)                             | 算术/比较/身份/逻辑/位/成员、赋值全解、优先级、运算符重载协议                                                                                                                                                                                                                                                                                                                                          |
-| [第5章 条件语句 & 循环语句 & 推导式](python-core/py-05-control-flow.md)    | 真值协议、if/elif/else、match/case、while/for、迭代器协议、推导式、生成器表达式                                                                                                                                                                                                                                                                                                                        |
-| [第6章 函数：从调用约定到函数式编程](python-core/py-06-functions.md)       | 函数对象与一等公民、传参语义（call-by-sharing）、封包解包、LEGB 与闭包（含装饰器示例）、lambda 与高阶函数、生成器函数                                                                                                                                                                                                                                                                                  |
-| [第7章 面向对象编程](python-core/py-07-oop.md)                             | 类与实例、方法绑定、四大特性（抽象/封装/继承/多态）、封装协议、MRO 与 super、鸭子类型/ABC/Protocol、特殊方法协议与对象生命周期、dataclass/enum/`__slots__`、设计模式（7.9 精简）                                                                                                                                                                                                                       |
-| [第7章配套：设计模式全景](python-core/py-07-design-patterns.md)            | GoF 创建型/结构型/行为型模式、SOLID 原则、模式"消亡"对照表、反模式与实战                                                                                                                                                                                                                                                                                                                               |
-| [第8章 异常处理与上下文管理器](python-core/py-08-exceptions-context.md)    | 异常对象模型与类层次、try/except/else/finally、异常链、ExceptionGroup/`except*`、EAFP vs LBYL、with 协议与 contextlib、事务式资源管理                                                                                                                                                                                                                                                                  |
-| [第9章 文件 I/O 与序列化](python-core/py-09-file-io-serialization.md)      | 分层 IO 体系（RawIO→缓冲→TextIO）、open() 全参数、编码/换行/缓冲、性能基准、随机访问、struct/mmap、pathlib/tempfile、pickle/json 序列化、原子写                                                                                                                                                                                                                                                        |
-| [第10章 模块与包管理](python-core/py-10-modules-packages.md)               | import 执行语义与字节码、importlib 流水线（PEP 451）、`__pycache__` 与 PEP 552、自定义 import 钩子、包/相对导入/命名空间包（PEP 420）、循环导入、venv 机制、pyproject.toml 打包（PEP 517/518/621）、wheel/editable（PEP 427/660）、pip/uv 与锁文件、zipapp/PEP 723 部署                                                                                                                                |
-| [第11章 并发与异步编程](python-core/py-11-concurrency-async.md)            | 进程/线程/协程三抽象与切换成本、Amdahl 定律、GIL 机制（PEP 703 自由线程）、线程锁/同步原语/`threading.local`、死锁四条件、queue 生产者-消费者、ThreadPoolExecutor/Future、multiprocessing（Pool/spawn/共享内存）、async/await 与事件循环（PEP 342/380/492）、asyncio 实战（gather/超时/Semaphore/Queue/to\_thread）、选型矩阵、并发陷阱与确定性测试                                                    |
-| [第12章 元编程](python-core/py-12-metaprogramming.md)                      | 装饰器深潜（语法糖展开/工厂/wraps/类装饰器/栈）、描述符协议（数据 vs 非数据描述符、property/classmethod/staticmethod/`__slots__` 实现）、属性访问完整路径（`__getattr__`/`__getattribute__`）、元类（type 即类、class 创建流程、`__prepare__`/`__init_subclass__`、注册表/单例元类）、`__call__`/`__new__`/`__reduce__` 协议、mini-dataclass/插件注册/声明式字段实战、元编程使用边界                   |
-| [第13章 标准库精选](python-core/py-13-stdlib.md)                           | 标准库全景与选型哲学、collections（defaultdict/Counter/deque/ChainMap/bisect/heapq/array）、itertools（惰性组合）、functools（lru\_cache/singledispatch）、datetime/zoneinfo（PEP 615）、math/decimal/random/secrets/statistics、subprocess（shell=False 安全）/shutil/glob、sqlite3（参数化防注入）/csv/configparser/argparse、logging（四件套/轮转/结构化）、typing（PEP 484/585/604）、隐藏宝石速查 |
-| [第14章 测试与调试](python-core/py-14-testing-debugging.md)                | 测试哲学与金字塔、TDD、可测试性设计、unittest（断言/生命周期/subTest）、pytest（fixture 注入/parametrize/AST 断言重写）、mock（patch 使用方语义/autospec）、覆盖率与 CI 门禁、pdb 断点调试（breakpoint/post-mortem/faulthandler）、traceback 解读、cProfile/timeit、doctest                                                                                                                            |
-| [第15章 性能优化与 C 扩展](python-core/py-15-performance-cext.md)          | 解释器执行模型、五层优化路线图（算法→语言级→向量化→JIT→C）、cProfile/line\_profiler/tracemalloc 进阶、复杂度优化、字节码视角（局部变量/方法绑定/join/内置函数）、3.11+ 特化解释器（PEP 659）、numpy 向量化预告、PyPy/numba、ctypes 调 C 库、Python C API（引用计数/GIL 释放/PyTypeObject）、Cython 类型化、性能回归与 CI、卷 1 全景收官                                                                |
-| [专题：深浅拷贝](python-core/py-topic-deep-shallow-copy.md)                        | 引用语义、is vs ==、浅/深拷贝、`__copy__`/`__deepcopy__` 协议、CPython 内存布局、七大陷阱                                                                                                                                                                                                                                                                                                              |
-| [专题：正则表达式](python-core/py-topic-regex.md)                                  | 正则与自动机理论、re 模块 API、编译与缓存机制、贪婪/惰性/回溯、环视/分组/标志、灾难性回溯与性能                                                                                                                                                                                                                                                                                                        |
-| [专题：反射机制](python-core/py-topic-reflection.md)                                | 内省基础（`type`/`dir`/`isinstance`）、属性访问协议（`getattr` 三剑客/`hasattr` 陷阱/完整查找路径/字节码证据）、`inspect` 工具箱（`signature`/`getsource`/`getmro`/谓词/栈帧）、动态调用与创建（`getattr` 分发/`type` 建类/`importlib`/`eval` 危险区）、反射驱动架构（插件/ORM/序列化/CLI/DI）、元数据反射、代价与边界                                                                                                                              |
-| [附录A：Python 3 版本演进](python-core/py-appendix-a-python3-version-evolution.md) | 3.0→3.14 核心 PEP 与 CPython 实现揭秘                                                                                                                                                                                                                                                                                                                                                                  |
-
-### 待写
-
-**卷 1**：✅ 全部完成（必读核心 + 进阶选修 + 3 专题 + 附录A）
-
-**卷 2**：✅ 全部完成（第0–5章 + 6 本深水配套 + 附录 A/B/C）。**卷 3–5**：见下方规划。
+| 章 | 内容 |
+|----|------|
+| [第1章 环境搭建](python-core/py-01-environment-setup.md) | 编程语言的分类、Python 的发展史、设计哲学、安装部署、pip/venv/uv、PEP 8 |
+| [第2章 基础语法](python-core/py-02-basic-syntax.md) | 语句/表达式、缩进/代码块、注释/docstring、标识符/关键字/命名、变量/对象/引用语义、赋值全解、运算符/短路/比较链、print/input/assert|
+| [第3章 标准数据类型](python-core/py-03-standard-types.md) | 数字、字符串、序列、映射与集合|
+| [第4章 运算符](python-core/py-04-operators.md) | 算术/比较/身份/逻辑/位/成员、赋值全解、优先级、运算符重载协议 |
+| [第5章 条件语句 & 循环语句 & 推导式](python-core/py-05-control-flow.md) | 真值协议、if/elif/else、match/case、while/for、迭代器协议、推导式、生成器表达式 |
+| [第6章 函数：从调用约定到函数式编程](python-core/py-06-functions.md) | 函数对象与一等公民、传参语义、封包解包、LEGB 与闭包、lambda 与高阶函数、生成器函数  |
+| [第7章 面向对象编程](python-core/py-07-oop.md) | 类与实例、方法绑定、抽象/封装/继承/多态、封装协议、MRO 与 super、鸭子类型/ABC/Protocol、特殊方法协议与对象生命周期、dataclass/enum/`__slots__`、设计模式|
+| [第7章配套：设计模式详解](python-core/py-07-design-patterns.md)  | 创建型/结构型/行为型模式、SOLID 原则、模式"消亡"对照表、反模式与实战 |
+| [第8章 异常处理与上下文管理器](python-core/py-08-exceptions-context.md) | 异常对象模型与类层次、try/except/else/finally、异常链、ExceptionGroup/`except*`、EAFP vs LBYL、with 协议与 contextlib、事务式资源管理 |
+| [第9章 文件 I/O 与序列化](python-core/py-09-file-io-serialization.md) | 分层 IO 体系（RawIO、缓冲、TextIO）、open() 全参数、编码/换行/缓冲、性能基准、随机访问、struct/mmap、pathlib/tempfile、pickle/json 序列化、原子写 |
+| [第10章 模块与包管理](python-core/py-10-modules-packages.md) | import 执行语义与字节码、importlib 流水线（PEP 451）、`__pycache__` 与 PEP 552、自定义 import 钩子、包/相对导入/命名空间包（PEP 420）、循环导入、venv 机制、pyproject.toml 打包（PEP 517/518/621）、wheel/editable（PEP 427/660）、pip/uv 与锁文件、zipapp/PEP 723 部署 |
+| [第11章 并发与异步编程](python-core/py-11-concurrency-async.md)  | 进程/线程/协程三抽象与切换成本、Amdahl 定律、GIL 机制（PEP 703 自由线程）、线程锁/同步原语/`threading.local`、死锁四条件、queue 生产者-消费者、ThreadPoolExecutor/Future、multiprocessing、async/await 与事件循环（PEP 342/380/492）、asyncio 实战、选型矩阵、并发陷阱与确定性测试 |
+| [第12章 元编程](python-core/py-12-metaprogramming.md) | 装饰器深入、描述符协议、属性访问完整路径、元类（type 即类、class 创建流程、`__prepare__`/`__init_subclass__`、注册表/单例元类）、`__call__`/`__new__`/`__reduce__` 协议、mini-dataclass/插件注册/声明式字段实战、元编程使用边界 |
+| [第13章 标准库精选](python-core/py-13-stdlib.md) | 标准库全景与选型哲学、collections、itertools（惰性组合）、functools、datetime/zoneinfo（PEP 615）、math/decimal/random/secrets/statistics、subprocess/shutil/glob、sqlite3/csv/configparser/argparse、logging、typing（PEP 484/585/604）、隐藏宝石速查 |
+| [第14章 测试与调试](python-core/py-14-testing-debugging.md) | 测试哲学与金字塔、TDD、可测试性设计、unittest、pytest、mock、覆盖率与 CI 门禁、pdb 断点调试（breakpoint/post-mortem/faulthandler）、traceback 解读、cProfile/timeit、doctest |
+| [第15章 性能优化与 C 扩展](python-core/py-15-performance-cext.md)  | 解释器执行模型、五层优化路线图、cProfile/line\_profiler/tracemalloc 进阶、复杂度优化、字节码视角、3.11+ 特化解释器（PEP 659）、numpy 向量化预告、PyPy/numba、ctypes 调 C 库、Python C API、Cython 类型化、性能回归与 CI、卷 1 全景收官 |
+| [专题：深浅拷贝](python-core/py-topic-deep-shallow-copy.md) | 引用语义、is vs ==、浅/深拷贝、`__copy__`/`__deepcopy__` 协议、CPython 内存布局、七大陷阱 |
+| [专题：正则表达式](python-core/py-topic-regex.md) | 正则与自动机理论、re 模块 API、编译与缓存机制、贪婪/惰性/回溯、环视/分组/标志、灾难性回溯与性能 |
+| [专题：反射机制](python-core/py-topic-reflection.md) | 内省基础、属性访问协议、`inspect` 工具箱、动态调用与创建、反射驱动架构、元数据反射、代价与边界 |
+| [附录A：Python 3 版本演进](python-core/py-appendix-a-python3-version-evolution.md) | 3.0→3.14 核心 PEP 与 CPython 实现 |
 
 ## 卷 2：科学计算与数据分析
 
@@ -73,10 +65,6 @@
 | [附录B 概率与数理统计速查](data-science/ds-appendix-b-prob-stats-quickref.md) | 19 张急救卡：SciPy 1.18 六处版本差异 / 概率与条件概率 / PMF-PDF-CDF 六方法 / ddof 三库口径 / 协方差与三种相关系数 / 12 个分布参数表 / LLN 与 CLT 代码版 / 标准误 / 区间估计（t 区间、Wilson 比例区间、bootstrap BCa）/ 检验选型决策表与常用写法（**`ttest_ind` 默认 Student 必须显式 Welch**）/ 多重比较 FWER 与 FDR / 功效与样本量（**scipy 无分析式求解器，给非中心 t 的十行实现**）/ 相关回归与稳健拟合 / 正态性四检验（**Lilliefors 陷阱、`anderson` 三种写法、`stats.fit` 不给 bounds 静默返回初值**）/ 重采样三件套 / 效应量 / 常见错误速查 14 条 / 报告模板 / 符号总表；代码逐段实跑 |
 | [附录C 建模竞赛速查卡](data-science/ds-appendix-c-modeling-quickref.md) | 19 张卡片按「问题类型 → 函数 → 最短可复制代码」组织：方程组 / 最小二乘 / 稀疏 / 线性规划 / 整数规划 / 五个建模套路 / 非线性与全局优化 / 求根 / 拟合与反问题 / 插值补全 / 积分 / 微分方程 / 随机模拟与敏感性 / 图与网络 / 聚类几何 / 信号频谱 / 性能速查 / 结果报告清单 / 该换什么库；全部代码逐段实跑通过 |
 
-### 待写
-
-卷 2 已无待写内容。后续可考虑：把附录 A/B 的公式推导补成第三个深水文件（`ds-appendix-ab-derivations.md`），或进入卷 3。
-
 ## 卷 3–5：规划中
 
 | 卷                      | 计划章节                                                                                                           |
@@ -96,7 +84,6 @@
 | 深度学习研究者   | 卷 1 必读核心 → 卷 2 → 卷 3 → 卷 4          |
 | LLM 应用开发者   | 卷 1 必读核心 → 卷 2 → 卷 5（深挖可加卷 4） |
 
-> 缺乏数学基础？从卷 2 的 `ds-00-math-primer.md`（数学前置章）起步即可。
 
 ## 特点
 

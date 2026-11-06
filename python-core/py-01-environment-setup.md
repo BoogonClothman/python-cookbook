@@ -10,7 +10,7 @@
 
 ### 1.1.1 什么是编程语言
 
-编程语言是人与计算机之间的**通信协议**。人类利用它来描述计算逻辑，计算机将它翻译为机器指令并执行。这个"翻译"机制，将编程语言分为两大阵营。
+编程语言是人与计算机之间的**通信协议**。人类利用它来描述计算逻辑，计算机将它翻译为机器指令并执行。
 
 #### 从机器语言到高级语言
 
@@ -28,7 +28,7 @@
   SELECT * FROM users;       ← 描述"做什么"，而非"怎么做"
 ```
 
-**Python 属于第三代高级语言**，但它在设计上大量吸收了第四代语言的声明式思想，让它读起来像"可执行的伪代码"。
+**Python 属于第三代高级语言**，但它在设计上大量吸收了第四代语言的声明式思想，让它读起来更像"可执行的伪代码"。
 
 #### 编译型 vs 解释型
 
@@ -52,7 +52,7 @@ Python 执行流程：
   .py 源码 → [编译器] → .pyc 字节码 → [PVM (Python 虚拟机)] → 机器执行
 ```
 
-> **工程现实**：对新手而言，"Python 是解释型语言"这句话就已经足够。但当你开始关注性能，你需要知道 PyPy（JIT 编译）、Cython（编译为 C 扩展）、Numba（LLVM JIT）等工具让 Python 可以在特定场景下接近甚至达到编译型语言的性能。
+> **工程现实**：对新手而言，"Python 是解释型语言"这句话就已经足够。但当你开始关注性能，你需要了解 PyPy（JIT 编译）、Cython（编译为 C 扩展）、Numba（LLVM JIT）等工具让 Python 可以在特定场景下接近甚至达到编译型语言的性能。
 
 #### 静态类型 vs 动态类型，强类型 vs 弱类型
 
@@ -61,14 +61,14 @@ Python 执行流程：
 ```python
 # Python：动态类型 + 强类型
 x = 42           # x 的类型是 int，但不需要声明
-x = "hello"      # x 现在可以是 str——类型随值而变（动态类型）
-x + 1            # TypeError: str + int 不允许（强类型——不会隐式"转换"）
+x = "hello"      # x 现在是 str：类型随值而变（动态类型）
+x + 1            # TypeError: str + int 不允许（强类型不接受隐式"转换"）
 ```
 ```c
 # C：静态类型 + 弱类型
 int x = 42;      // x 的类型在编译时确定，不可改变
 char* y = "hi";
-x + *y;          // 允许，指针被隐式转为整数（弱类型）
+x + *y;          // 允许，指针类型被隐式转为整型（弱类型）
 ```
 
 | 类型系统 | 示例语言 | 含义 |
@@ -119,7 +119,7 @@ Python 的**动态 + 强类型**组合的意义：不需要声明类型（开发
 | 2025 | 3.14 | 注解的延迟求值（PEP 649）、性能持续提升、错误信息改进 |
 | 2026 | 3.15 | Windows 官方安装入口切换为 Python Install Manager（PEP 773）；传统 .exe 安装包自 3.16 起停发 |
 
-> **Python 3.13（2024）引入两个历史性变更**：可选的自由线程模式去掉 GIL（全局解释器锁），以及基于 copy-and-patch 的 JIT 编译器。这是 Python 诞生三十余年来最激进的变化。**Python 3.14（2025）** 带来了注解的延迟求值（PEP 649）等改进；**Python 3.15 于 2026 年 10 月 9 日发布，是截至 2026 年 11 月的最新稳定版**（3.14 仍处于 bugfix 维护期）。如果你现在开始学习 Python，3.15 是推荐起点，3.14 同样完全可用。
+> **Python 3.13（2024）引入两个历史性变更**：可选的自由线程模式去掉 GIL（全局解释器锁），以及基于 copy-and-patch 的 JIT 编译器。这是 Python 诞生三十余年来最激进的变化。**Python 3.14（2025）** 带来了注解的延迟求值（PEP 649）等改进；**Python 3.15 于 2026 年 10 月 9 日发布，是截至 2026 年 11 月的最新稳定版**（3.14 仍处于 bugfix 维护期）。如果你现在开始学习 Python，3.15 是推荐起点；当然，3.14 也同样完全可用。
 >
 > **同期最重要的发行工程变革**：PEP 773（Python Install Manager）于 2025 年 4 月获批、同年 10 月随 3.14 发布，Windows 的安装方式在 3.14/3.15 周期内完成换代——详见 1.2.1。
 
@@ -146,7 +146,7 @@ Simple is better than complex.            # 简单优于复杂
 Complex is better than complicated.       # 复杂优于杂乱
 Flat is better than nested.               # 扁平优于嵌套
 Sparse is better than dense.              # 稀疏优于密集
-Readability counts.                       # 可读性至上
+Readability counts.                       # 可读性始终至上
 Special cases aren't special enough to break the rules.
 Although practicality beats purity.       # 务实胜过纯粹
 Errors should never pass silently.
@@ -189,15 +189,15 @@ if len(items) == 0:     # Unpythonic ✗ though it works.
     ...
 ```
 
-**3. Batteries Included（自带电池）**
+**3. 自带电池（Batteries Included）**
 
-Python 标准库极其丰富：HTTP 客户端、JSON 解析、正则表达式、电子邮件、SQLite 数据库、XML 处理、日志系统等等。无需安装任何三方库就能完成大量实际工作。这显著降低了新手入门的学习门槛，你不需要在学语言之前先学习复杂的包管理。
+Python 标准库极其丰富：HTTP 客户端、JSON 解析、正则表达式、电子邮件、SQLite 数据库、XML 处理、日志系统等等。无需安装任何三方库就能完成大量实际工作，这显著降低了新手入门的学习门槛，不需要在学语言之前先学习复杂的包管理。
 
 ### 1.1.4 Python 的核心特性
 
 #### 动态类型 + 强类型
 
-上文已经示例。补充一个重要的工程后果：
+上文已经示例。现在补充一个重要的工程后果：
 
 ```python
 def greet(name):
@@ -221,7 +221,7 @@ shout("Alice")      # "ALICE!"
 shout(42)           # AttributeError: 'int' object has no attribute 'upper'
 ```
 
-这种"运行时暴露类型错误"的特性，推动了 Python 3.5 引入**类型注解**（PEP 484），和 `mypy`/`pyright` 等静态类型检查器的兴起——在不改变动态类型本质的前提下，获得静态检查的安全网。
+这种"运行时暴露类型错误"的特性，推动了 Python 3.5 引入**类型注解**（PEP 484），和 `mypy`/`pyright` 等静态类型检查器的兴起：在不改变动态类型本质的前提下，获得静态检查的安全网。
 
 ```python
 def greet(name: str) -> str:          # 类型注解（运行时完全忽略）
@@ -232,7 +232,7 @@ greet(42)  # mypy 会在不执行代码的情况下报错：Argument 1 has incom
 
 #### 一切皆对象
 
-在 Python 中，**一切都是对象**——包括整数、字符串、函数、类、模块、甚至类型本身。
+在 Python 中，**一切都是对象**，包括整数、字符串、函数、类、模块、甚至类型本身。
 
 ```python
 >>> isinstance(42, object)
@@ -978,7 +978,7 @@ if __name__ == "__main__":
 
 ### 1.2.7 编码规范基础（PEP 8）
 
-PEP 8 是 Python 官方编程风格指南（Style Guide for Python Code），同时也是所有Python编码规范的唯一“宪法”。它解决的不是风格的对错问题，而是一致性问题。当所有 Python 代码遵循同一套格式规则，阅读外源代码的认知负担将大幅降低。
+PEP 8 是 Python 官方编程风格指南（Style Guide for Python Code），同时也是所有Python编码规范的“宪法”。它解决的不是风格的对错问题，而是一致性问题。当所有 Python 代码遵循同一套格式规则，阅读外源代码的认知负担将大幅降低。
 
 #### 命名约定
 
@@ -1081,7 +1081,7 @@ import requests
 from myproject.utils import helper
 
 # 禁止：import *（除非模块明确设计了 __all__）
-from module import *          # ❌ 污染命名空间
+from module import *          # ❌ 可能污染命名空间
 
 # 过长的模块名可用 as 简化
 import numpy as np
@@ -1092,7 +1092,7 @@ import matplotlib.pyplot as plt
 
 ```python
 # 行内注释：与代码同级，说明"为什么"而不是"做什么"
-count = count + 1  # 补偿 0-index 偏移（这是有效的注释）
+count = count + 1  # 补偿 0-index 偏移（有效注释）
 
 count = count + 1  # 计数器加 1（无效注释）
 
@@ -1117,6 +1117,7 @@ def fibonacci(n: int) -> list[int]:
         raise ValueError("n must be non-negative")
     # ...
 ```
+后续你将了解有关注释的更多内容。
 
 ### 1.2.8 获取帮助
 
@@ -1196,4 +1197,4 @@ dir(str)             # 列出 str 类的所有属性和方法
 - ✅ 已理解并创建了第一个虚拟环境
 - ✅ 已运行过 `hello.py`，确认一切正常
 
-如果你在这些步骤中遇到任何问题，**请立即解决**，不要遗留任何环境问题，这样才能开始下一章的学习。
+如果你在这些步骤中遇到任何问题，**请立即解决**，不要遗留任何环境问题，这样才能开始后续章节的学习。
