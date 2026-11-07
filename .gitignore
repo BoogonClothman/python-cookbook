@@ -8,6 +8,7 @@ dist/
 build/
 *.egg
 .eggs/
+.uv-cache/
 
 # Virtual environments
 venv/
